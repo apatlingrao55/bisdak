@@ -98,7 +98,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
                 <ApproveAllButton count={pendingSubmissions.length} />
               )}
             </div>
-            </h2>
             {pendingSubmissions.length === 0 ? (
               <p style={{ color: '#52525B', fontSize: '15px' }}>No pending submissions. All clear!</p>
             ) : (
