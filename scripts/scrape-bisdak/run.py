@@ -19,7 +19,6 @@ from db import (
     get_conn, fetch_existing_names, fetch_existing_slugs,
     fetch_category_id, fetch_region_id, insert_submission, slugify, make_unique_slug,
 )
-from scrapers.nocowboys import NoCowboysScraper
 from scrapers.finda import FindaScraper
 from scrapers.pinoysnz import PinoysNZScraper
 
@@ -27,7 +26,7 @@ from scrapers.pinoysnz import PinoysNZScraper
 def run():
     all_leads = []
 
-    for ScraperClass in [NoCowboysScraper, FindaScraper, PinoysNZScraper]:
+    for ScraperClass in [FindaScraper, PinoysNZScraper]:
         try:
             leads = ScraperClass().scrape()
             logger.info("[%s] scraped %d", ScraperClass.SOURCE_NAME, len(leads))
