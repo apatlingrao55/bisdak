@@ -1,28 +1,27 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
-import { sql } from 'drizzle-orm'
+import { boolean, integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 
-export const users = sqliteTable('users', {
+export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash'),
   name: text('name'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
-export const categories = sqliteTable('categories', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+export const categories = pgTable('categories', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   icon: text('icon').notNull(),
 })
 
-export const regions = sqliteTable('regions', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+export const regions = pgTable('regions', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
 })
 
-export const businesses = sqliteTable('businesses', {
+export const businesses = pgTable('businesses', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
@@ -34,14 +33,14 @@ export const businesses = sqliteTable('businesses', {
   facebookUrl: text('facebook_url'),
   googleMapsUrl: text('google_maps_url'),
   ownerId: text('owner_id').references(() => users.id),
-  isFilipino: integer('is_filipino', { mode: 'boolean' }).default(true),
+  isFilipino: boolean('is_filipino').default(true),
   status: text('status', { enum: ['pending', 'active', 'rejected'] }).default('active'),
   photoUrl: text('photo_url'),
   openStatus: text('open_status', { enum: ['open', 'closed'] }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
-export const reviews = sqliteTable('reviews', {
+export const reviews = pgTable('reviews', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   businessId: text('business_id').notNull().references(() => businesses.id),
   reviewerName: text('reviewer_name').notNull(),
@@ -49,11 +48,11 @@ export const reviews = sqliteTable('reviews', {
   rating: integer('rating').notNull(),
   body: text('body').notNull(),
   ownerResponse: text('owner_response'),
-  isFlagged: integer('is_flagged', { mode: 'boolean' }).default(false),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  isFlagged: boolean('is_flagged').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
-export const submissions = sqliteTable('submissions', {
+export const submissions = pgTable('submissions', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   slug: text('slug').notNull(),
@@ -66,10 +65,10 @@ export const submissions = sqliteTable('submissions', {
   googleMapsUrl: text('google_maps_url'),
   submitterEmail: text('submitter_email'),
   status: text('status', { enum: ['pending', 'approved', 'rejected'] }).default('pending'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
-export const posts = sqliteTable('posts', {
+export const posts = pgTable('posts', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   title: text('title').notNull(),
   slug: text('slug').notNull().unique(),
@@ -77,12 +76,12 @@ export const posts = sqliteTable('posts', {
   content: text('content').notNull(),
   authorName: text('author_name').notNull().default('BisDak Team'),
   status: text('status', { enum: ['draft', 'published'] }).default('published'),
-  publishedAt: integer('published_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  publishedAt: timestamp('published_at').defaultNow(),
+  createdAt: timestamp('created_at').defaultNow(),
 })
 
-// NextAuth v5 required tables for DrizzleAdapter
-export const accounts = sqliteTable('accounts', {
+// NextAuth v5 tables
+export const accounts = pgTable('accounts', {
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
   type: text('type').notNull(),
   provider: text('provider').notNull(),
@@ -96,14 +95,14 @@ export const accounts = sqliteTable('accounts', {
   session_state: text('session_state'),
 })
 
-export const sessions = sqliteTable('sessions', {
+export const sessions = pgTable('sessions', {
   sessionToken: text('sessionToken').primaryKey(),
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  expires: integer('expires', { mode: 'timestamp' }).notNull(),
+  expires: timestamp('expires').notNull(),
 })
 
-export const verificationTokens = sqliteTable('verification_tokens', {
+export const verificationTokens = pgTable('verification_tokens', {
   identifier: text('identifier').notNull(),
   token: text('token').notNull(),
-  expires: integer('expires', { mode: 'timestamp' }).notNull(),
+  expires: timestamp('expires').notNull(),
 })

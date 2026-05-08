@@ -1,11 +1,10 @@
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
+import postgres from 'postgres'
+import { drizzle } from 'drizzle-orm/postgres-js'
 import * as schema from './schema'
 
-const sqlite = new Database('./filipinohub.db')
-sqlite.pragma('journal_mode = WAL')
-sqlite.pragma('foreign_keys = ON')
-const db = drizzle(sqlite, { schema })
+const client = postgres(process.env.DATABASE_URL!, { prepare: false })
+const db = drizzle(client, { schema })
+
 
 async function seed() {
   console.log('Seeding categories...')
@@ -249,6 +248,7 @@ async function seed() {
   ])
 
   console.log('Seed complete! 8 categories, 5 regions, 20 businesses.')
+  await client.end()
   process.exit(0)
 }
 
