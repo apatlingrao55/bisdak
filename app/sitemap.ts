@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { MetadataRoute } from 'next'
 import { db } from '@/lib/db'
 import { businesses, posts } from '@/lib/db/schema'

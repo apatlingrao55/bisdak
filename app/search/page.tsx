@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Nav from '@/components/Nav'
 import BusinessCard from '@/components/BusinessCard'
 import SearchBar from '@/components/SearchBar'

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Nav from '@/components/Nav'
 import HeroCarousel from '@/components/HeroCarousel'
 import CategoryGrid from '@/components/CategoryGrid'

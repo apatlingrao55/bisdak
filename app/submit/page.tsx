@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Nav from '@/components/Nav'
 import { db } from '@/lib/db'
 import { categories, regions } from '@/lib/db/schema'

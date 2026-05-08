@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
 import { db } from '@/lib/db'

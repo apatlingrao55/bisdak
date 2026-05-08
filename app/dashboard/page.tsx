@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Nav from '@/components/Nav'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
