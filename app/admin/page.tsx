@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
+import ApproveAllButton from './ApproveAllButton'
 import { db } from '@/lib/db'
 import { submissions, reviews, posts } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
@@ -89,8 +90,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
 
           {/* Pending submissions */}
           <section style={{ marginBottom: '64px' }}>
-            <h2 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 400, margin: '0 0 24px' }}>
-              Pending Submissions ({pendingSubmissions.length})
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+              <h2 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 400, margin: 0 }}>
+                Pending Submissions ({pendingSubmissions.length})
+              </h2>
+              {pendingSubmissions.length > 0 && (
+                <ApproveAllButton count={pendingSubmissions.length} />
+              )}
+            </div>
             </h2>
             {pendingSubmissions.length === 0 ? (
               <p style={{ color: '#52525B', fontSize: '15px' }}>No pending submissions. All clear!</p>
