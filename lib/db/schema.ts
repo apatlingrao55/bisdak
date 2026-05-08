@@ -29,6 +29,7 @@ export const businesses = pgTable('businesses', {
   regionId: integer('region_id').references(() => regions.id),
   description: text('description'),
   phone: text('phone'),
+  email: text('email'),
   website: text('website'),
   facebookUrl: text('facebook_url'),
   googleMapsUrl: text('google_maps_url'),

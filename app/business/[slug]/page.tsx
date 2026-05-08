@@ -19,6 +19,7 @@ async function getBiz(slug: string) {
       slug: businesses.slug,
       description: businesses.description,
       phone: businesses.phone,
+      email: businesses.email,
       website: businesses.website,
       facebookUrl: businesses.facebookUrl,
       googleMapsUrl: businesses.googleMapsUrl,
@@ -147,6 +148,11 @@ export default async function BusinessPage({ params }: { params: Params }) {
               {biz.website && (
                 <a href={biz.website} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '15px', padding: '10px 20px' }}>
                   🌐 Website
+                </a>
+              )}
+              {biz.email && (
+                <a href={`mailto:${biz.email}`} className="btn-ghost" style={{ fontSize: '15px', padding: '10px 20px' }}>
+                  ✉️ {biz.email}
                 </a>
               )}
               {biz.facebookUrl && (
