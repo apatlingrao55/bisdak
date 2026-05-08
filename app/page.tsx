@@ -159,7 +159,7 @@ export default async function HomePage() {
           © 2026 BisDak Pinoy Business Hub · bisdak.co.nz ·{' '}
           <a href="/submit" style={{ color: '#71717A', textDecoration: 'none' }}>Submit a Business</a>
           {' · '}
-          <a href="/admin?token=admin123" style={{ color: '#71717A', textDecoration: 'none' }}>Admin</a>
+          <a href="/admin" style={{ color: '#71717A', textDecoration: 'none' }}>Admin</a>
         </p>
       </footer>
     </main>

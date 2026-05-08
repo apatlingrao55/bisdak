@@ -1,26 +1,49 @@
 export const dynamic = 'force-dynamic'
 
+import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import { db } from '@/lib/db'
 import { submissions, reviews, posts } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 
-type SearchParams = Promise<{ token?: string }>
+type SearchParams = Promise<{ error?: string }>
+
+async function isAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies()
+  const session = cookieStore.get('admin_session')?.value ?? ''
+  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
+  return !!adminToken && session === adminToken
+}
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams
-  const token = params.token ?? ''
+  const authed = await isAuthenticated()
 
-  if (!token || token !== process.env.ADMIN_TOKEN) {
+  if (!authed) {
     return (
       <main>
         <Nav />
         <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ color: '#71717A', fontSize: '16px', margin: '0 0 16px' }}>Admin access requires a valid token.</p>
-            <p style={{ color: '#52525B', fontSize: '14px' }}>
-              Access: <code style={{ color: '#36F4A4' }}>/admin?token=YOUR_ADMIN_TOKEN</code>
-            </p>
+          <div style={{ width: '100%', maxWidth: '360px', padding: '0 24px' }}>
+            <h1 style={{ color: '#ffffff', fontSize: '28px', fontWeight: 400, margin: '0 0 8px', textAlign: 'center' }}>Admin</h1>
+            <p style={{ color: '#52525B', fontSize: '14px', textAlign: 'center', margin: '0 0 32px' }}>Enter your admin token to continue.</p>
+            {params.error && (
+              <p style={{ color: '#F87171', fontSize: '14px', textAlign: 'center', margin: '0 0 16px' }}>Invalid token. Try again.</p>
+            )}
+            <form action="/api/admin/login" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input
+                name="token"
+                type="password"
+                placeholder="Admin token"
+                required
+                autoFocus
+                className="input-dark"
+                style={{ width: '100%', boxSizing: 'border-box' }}
+              />
+              <button type="submit" className="btn-primary" style={{ width: '100%', padding: '12px' }}>
+                Sign in
+              </button>
+            </form>
           </div>
         </div>
       </main>
@@ -50,11 +73,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000000' }}>
         <div style={{ maxWidth: '960px', margin: '0 auto', padding: '56px 24px' }}>
 
-          <h1 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 330, margin: '0 0 8px' }}>
-            Admin Panel
-          </h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '16px' }}>
+            <h1 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 330, margin: 0 }}>
+              Admin Panel
+            </h1>
+            <form action="/api/admin/logout" method="POST">
+              <button type="submit" style={{ background: 'transparent', color: '#52525B', border: '1px solid #3F3F46', borderRadius: '9999px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer' }}>
+                Sign out
+              </button>
+            </form>
+          </div>
           <p style={{ color: '#A1A1AA', margin: '0 0 56px', fontSize: '16px' }}>
-            Moderation queue · Token authenticated
+            Moderation queue
           </p>
 
           {/* Pending submissions */}
@@ -85,14 +115,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
                       <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                         <form action={`/api/admin/submissions/${sub.id}`} method="POST">
                           <input type="hidden" name="status" value="approved" />
-                          <input type="hidden" name="token" value={token} />
                           <button type="submit" className="btn-primary" style={{ padding: '8px 16px', fontSize: '14px' }}>
                             ✓ Approve
                           </button>
                         </form>
                         <form action={`/api/admin/submissions/${sub.id}`} method="POST">
                           <input type="hidden" name="status" value="rejected" />
-                          <input type="hidden" name="token" value={token} />
                           <button
                             type="submit"
                             style={{
@@ -128,7 +156,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
 
             {/* New post form */}
             <form action="/api/admin/posts" method="POST" style={{ marginBottom: '32px' }}>
-              <input type="hidden" name="token" value={token} />
               <div style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <p style={{ color: '#36F4A4', fontSize: '13px', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 500, margin: 0 }}>New Post</p>
                 <input

@@ -2,13 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { posts } from '@/lib/db/schema'
 
-export async function POST(req: NextRequest) {
-  const data = await req.formData()
-  const token = data.get('token') as string
+function isAuthorized(req: NextRequest): boolean {
+  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
+  if (!adminToken) return false
+  return (req.cookies.get('admin_session')?.value ?? '') === adminToken
+}
 
-  if (!token || token !== process.env.ADMIN_TOKEN) {
+export async function POST(req: NextRequest) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const data = await req.formData()
 
   const title = (data.get('title') as string)?.trim()
   const slug = (data.get('slug') as string)?.trim()
@@ -26,5 +31,5 @@ export async function POST(req: NextRequest) {
 
   await db.insert(posts).values({ title, slug, excerpt, content, authorName, status: 'published' })
 
-  return NextResponse.redirect(new URL(`/admin?token=${token}`, req.url))
+  return NextResponse.redirect(new URL('/admin', req.url))
 }
