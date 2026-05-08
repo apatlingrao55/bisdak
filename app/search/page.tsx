@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
     .leftJoin(regions, eq(businesses.regionId, regions.id))
     .leftJoin(reviews, eq(reviews.businessId, businesses.id))
     .where(and(...conditions))
-    .groupBy(businesses.id)
+    .groupBy(businesses.id, categories.name, regions.name)
     .orderBy(orderBy)
 
   return (

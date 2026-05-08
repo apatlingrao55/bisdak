@@ -35,7 +35,7 @@ export default async function HomePage() {
     .leftJoin(regions, eq(businesses.regionId, regions.id))
     .leftJoin(reviews, eq(reviews.businessId, businesses.id))
     .where(eq(businesses.status, 'active'))
-    .groupBy(businesses.id)
+    .groupBy(businesses.id, categories.name, regions.name)
     .orderBy(desc(businesses.createdAt))
     .limit(6)
 
