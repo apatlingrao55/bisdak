@@ -32,7 +32,10 @@ export default function Nav() {
         href="/"
         style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 700, fontSize: '17px', letterSpacing: '-0.2px' }}
       >
-        🇵🇭 BisDak <span style={{ fontWeight: 400, color: '#A1A1AA' }}>— Pinoy Business Hub NZ</span>
+        🇵🇭 BisDak{' '}
+        <span className="hidden sm:inline" style={{ fontWeight: 400, color: '#A1A1AA' }}>
+          — Pinoy Business Hub NZ
+        </span>
       </Link>
 
       {/* Desktop nav */}
