@@ -1,13 +1,21 @@
 import Nav from '@/components/Nav'
-import SearchBar from '@/components/SearchBar'
+import HeroCarousel from '@/components/HeroCarousel'
 import CategoryGrid from '@/components/CategoryGrid'
 import BusinessCard from '@/components/BusinessCard'
 import { db } from '@/lib/db'
-import { businesses, categories, regions, reviews } from '@/lib/db/schema'
+import { businesses, categories, regions, reviews, posts } from '@/lib/db/schema'
 import { eq, desc, sql } from 'drizzle-orm'
+import Link from 'next/link'
 
 export default async function HomePage() {
   const allCategories = await db.select().from(categories)
+
+  const latestPosts = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.status, 'published'))
+    .orderBy(desc(posts.publishedAt))
+    .limit(3)
 
   const featured = await db
     .select({
@@ -34,61 +42,7 @@ export default async function HomePage() {
   return (
     <main>
       <Nav />
-
-      {/* Hero */}
-      <section style={{
-        background: '#000000',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '120px 24px 80px',
-        textAlign: 'center',
-      }}>
-        <p style={{ color: '#A1A1AA', fontSize: '14px', letterSpacing: '2px', textTransform: 'uppercase', margin: '0 0 24px', fontWeight: 500 }}>
-          New Zealand&apos;s Filipino Business Directory
-        </p>
-        <h1 style={{
-          fontSize: 'clamp(48px, 8vw, 96px)',
-          fontWeight: 330,
-          lineHeight: 1.0,
-          color: '#ffffff',
-          margin: '0 0 28px',
-          maxWidth: '820px',
-          letterSpacing: '-0.5px',
-        }}>
-          Find your<br />kababayan&apos;s business.
-        </h1>
-        <p style={{
-          color: '#A1A1AA',
-          fontSize: '20px',
-          fontWeight: 400,
-          margin: '0 0 48px',
-          maxWidth: '520px',
-          lineHeight: 1.5,
-        }}>
-          Discover, review, and support Filipino-owned businesses across every region of New Zealand.
-        </p>
-        <SearchBar />
-
-        <div style={{ display: 'flex', gap: '12px', marginTop: '28px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ color: '#52525B', fontSize: '14px' }}>Popular:</span>
-          {[
-            { label: 'Food & Dining', slug: 'food-dining' },
-            { label: 'Remittance & Travel', slug: 'remittance-travel' },
-            { label: 'Health & Wellness', slug: 'health-wellness' },
-          ].map(tag => (
-            <a
-              key={tag.slug}
-              href={`/search?category=${tag.slug}`}
-              style={{ color: '#71717A', fontSize: '14px', textDecoration: 'underline', textDecorationColor: '#3F3F46' }}
-            >
-              {tag.label}
-            </a>
-          ))}
-        </div>
-      </section>
+      <HeroCarousel />
 
       {/* Categories */}
       <section style={{ background: '#061A1C', padding: '80px 24px' }}>
@@ -110,7 +64,7 @@ export default async function HomePage() {
             Recently Added
           </h2>
           <p style={{ color: '#A1A1AA', margin: '0 0 48px', fontSize: '18px' }}>
-            The latest Filipino businesses listed on Filipino Hub NZ
+            The latest Pinoy businesses listed on BisDak
           </p>
           <div style={{
             display: 'grid',
@@ -126,6 +80,59 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* News teaser */}
+      {latestPosts.length > 0 && (
+        <section style={{ background: '#061A1C', padding: '80px 24px', borderTop: '1px solid #1E2C31' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '48px', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <h2 style={{ color: '#ffffff', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 330, margin: '0 0 8px' }}>
+                  News & Stories
+                </h2>
+                <p style={{ color: '#A1A1AA', margin: 0, fontSize: '17px' }}>
+                  Community updates from the Pinoy business world
+                </p>
+              </div>
+              <Link href="/blog" style={{ color: '#36F4A4', fontSize: '15px', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                All posts →
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+              {latestPosts.map(post => (
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  style={{ textDecoration: 'none', display: 'block' }}
+                >
+                  <article style={{
+                    background: '#02090A',
+                    border: '1px solid #1E2C31',
+                    borderRadius: '12px',
+                    padding: '28px',
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 200ms ease',
+                  }}>
+                    <p style={{ color: '#52525B', fontSize: '12px', letterSpacing: '0.5px', margin: '0 0 12px' }}>
+                      {post.publishedAt
+                        ? new Date(post.publishedAt).toLocaleDateString('en-NZ', { year: 'numeric', month: 'short', day: 'numeric' })
+                        : ''}
+                    </p>
+                    <h3 style={{ color: '#ffffff', fontSize: '18px', fontWeight: 500, lineHeight: 1.3, margin: '0 0 12px' }}>
+                      {post.title}
+                    </h3>
+                    <p style={{ color: '#A1A1AA', fontSize: '15px', lineHeight: 1.6, margin: '0 0 20px' }}>
+                      {post.excerpt.length > 100 ? post.excerpt.slice(0, 100) + '…' : post.excerpt}
+                    </p>
+                    <span style={{ color: '#36F4A4', fontSize: '14px', fontWeight: 500 }}>Read more →</span>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA strip */}
       <section style={{
@@ -147,7 +154,7 @@ export default async function HomePage() {
 
       <footer style={{ background: '#000000', padding: '28px 24px', textAlign: 'center', borderTop: '1px solid #1E2C31' }}>
         <p style={{ color: '#52525B', fontSize: '14px', margin: 0 }}>
-          © 2026 Filipino Hub NZ ·{' '}
+          © 2026 BisDak Pinoy Business Hub · bisdak.co.nz ·{' '}
           <a href="/submit" style={{ color: '#71717A', textDecoration: 'none' }}>Submit a Business</a>
           {' · '}
           <a href="/admin?token=admin123" style={{ color: '#71717A', textDecoration: 'none' }}>Admin</a>

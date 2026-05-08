@@ -8,9 +8,33 @@ const inter = Inter({
   display: 'swap',
 })
 
+const BASE = 'https://bisdak.co.nz'
+
 export const metadata: Metadata = {
-  title: 'Filipino Hub NZ — Find Filipino Businesses in New Zealand',
-  description: "The definitive directory of Filipino-owned businesses across New Zealand. Find your kababayan's business.",
+  metadataBase: new URL(BASE),
+  title: {
+    default: 'BisDak — Pinoy Business Hub NZ',
+    template: '%s — BisDak NZ',
+  },
+  description: "New Zealand's definitive directory of Filipino-owned businesses. Find your kababayan's business at bisdak.co.nz.",
+  keywords: ['Filipino businesses New Zealand', 'Pinoy business NZ', 'Filipino directory NZ', 'BisDak', 'Filipino-owned NZ'],
+  authors: [{ name: 'BisDak Team', url: BASE }],
+  creator: 'BisDak',
+  openGraph: {
+    type: 'website',
+    locale: 'en_NZ',
+    url: BASE,
+    siteName: 'BisDak — Pinoy Business Hub NZ',
+    title: 'BisDak — Pinoy Business Hub NZ',
+    description: "New Zealand's definitive directory of Filipino-owned businesses.",
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BisDak — Pinoy Business Hub NZ',
+    description: "New Zealand's definitive directory of Filipino-owned businesses.",
+  },
+  alternates: { canonical: BASE },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 }
 
 export default function RootLayout({

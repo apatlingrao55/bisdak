@@ -69,6 +69,18 @@ export const submissions = sqliteTable('submissions', {
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
 })
 
+export const posts = sqliteTable('posts', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  title: text('title').notNull(),
+  slug: text('slug').notNull().unique(),
+  excerpt: text('excerpt').notNull(),
+  content: text('content').notNull(),
+  authorName: text('author_name').notNull().default('BisDak Team'),
+  status: text('status', { enum: ['draft', 'published'] }).default('published'),
+  publishedAt: integer('published_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
+})
+
 // NextAuth v5 required tables for DrizzleAdapter
 export const accounts = sqliteTable('accounts', {
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),

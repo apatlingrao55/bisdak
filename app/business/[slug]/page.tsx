@@ -2,14 +2,14 @@ import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
 import { db } from '@/lib/db'
 import { businesses, categories, regions, reviews } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, avg, count } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
+
+const BASE = 'https://bisdak.co.nz'
 
 type Params = Promise<{ slug: string }>
 
-export default async function BusinessPage({ params }: { params: Params }) {
-  const { slug } = await params
-
+async function getBiz(slug: string) {
   const [biz] = await db
     .select({
       id: businesses.id,
@@ -31,6 +31,35 @@ export default async function BusinessPage({ params }: { params: Params }) {
     .leftJoin(regions, eq(businesses.regionId, regions.id))
     .where(eq(businesses.slug, slug))
     .limit(1)
+  return biz ?? null
+}
+
+export async function generateMetadata({ params }: { params: Params }) {
+  const { slug } = await params
+  const biz = await getBiz(slug)
+  if (!biz) return {}
+  const title = `${biz.name} — ${biz.categoryName ?? 'Filipino Business'} in ${biz.regionName ?? 'New Zealand'}`
+  const description = biz.description
+    ? `${biz.description} · Filipino-owned business in ${biz.regionName ?? 'NZ'} listed on BisDak.`
+    : `${biz.name} is a Filipino-owned business in ${biz.regionName ?? 'New Zealand'}. Find contact details and reviews on BisDak.`
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/business/${slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE}/business/${slug}`,
+      type: 'website',
+      ...(biz.photoUrl ? { images: [{ url: biz.photoUrl, alt: biz.name }] } : {}),
+    },
+    twitter: { card: 'summary', title, description },
+  }
+}
+
+export default async function BusinessPage({ params }: { params: Params }) {
+  const { slug } = await params
+  const biz = await getBiz(slug)
 
   if (!biz) notFound()
 
@@ -44,8 +73,29 @@ export default async function BusinessPage({ params }: { params: Params }) {
     ? bizReviews.reduce((sum, r) => sum + r.rating, 0) / bizReviews.length
     : 0
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: biz.name,
+    description: biz.description ?? undefined,
+    url: biz.website ?? `${BASE}/business/${biz.slug}`,
+    telephone: biz.phone ?? undefined,
+    ...(biz.regionName ? { address: { '@type': 'PostalAddress', addressRegion: biz.regionName, addressCountry: 'NZ' } } : {}),
+    ...(avgRating > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: bizReviews.length,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    } : {}),
+    ...(biz.photoUrl ? { image: biz.photoUrl } : {}),
+  }
+
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000000' }}>
 
