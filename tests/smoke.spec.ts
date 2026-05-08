@@ -32,7 +32,7 @@ test('home page loads', async ({ page }) => {
 test('search page loads', async ({ page }) => {
   const errors = collectConsoleErrors(page)
   await page.goto('/search')
-  await expect(page.locator('input[type="search"], input[name="q"]').first()).toBeVisible()
+  await expect(page.locator('input[placeholder*="Search"]').first()).toBeVisible()
   expect(errors).toHaveLength(0)
 })
 
