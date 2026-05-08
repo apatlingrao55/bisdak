@@ -29,7 +29,7 @@ export default function BusinessCard({ business }: { business: Business }) {
       }}
       className="shadow-card hover:border-[#1E2C31]"
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px', flexWrap: 'wrap' }}>
         <h3 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
           {business.name}
         </h3>
