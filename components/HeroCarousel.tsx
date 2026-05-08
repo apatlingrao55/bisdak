@@ -233,13 +233,13 @@ export default function HeroCarousel() {
       {/* Background */}
       <div style={{ position: 'absolute', inset: 0, background: s.bg, transition: 'background 600ms ease' }} />
 
-      {/* Icon */}
-      <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 'clamp(240px, 38vw, 460px)', height: 'clamp(240px, 38vw, 460px)', opacity: 0.8, pointerEvents: 'none' }}>
+      {/* Icon — hidden on mobile to avoid overlap */}
+      <div className="hidden sm:block" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 'clamp(200px, 34vw, 460px)', height: 'clamp(200px, 34vw, 460px)', opacity: 0.8, pointerEvents: 'none' }}>
         {s.icon}
       </div>
 
       {/* Text content */}
-      <div style={{ position: 'relative', zIndex: 2, maxWidth: 1280, width: '100%', padding: '120px 32px 100px', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 1280, width: '100%', padding: 'clamp(72px, 10vh, 120px) clamp(20px, 4vw, 32px) clamp(64px, 8vh, 100px)', boxSizing: 'border-box' }}>
         <p style={{ color: s.accent, fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', fontWeight: 600, margin: '0 0 16px' }}>{s.label}</p>
         <h1 style={{ fontSize: 'clamp(40px, 7vw, 84px)', fontWeight: 330, lineHeight: 1.02, color: '#fff', margin: '0 0 20px', maxWidth: 620, whiteSpace: 'pre-line' }}>{s.title}</h1>
         <p style={{ color: '#A1A1AA', fontSize: 'clamp(15px, 2vw, 19px)', margin: '0 0 36px', maxWidth: 460, lineHeight: 1.55 }}>{s.subtitle}</p>

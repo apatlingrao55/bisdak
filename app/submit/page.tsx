@@ -17,7 +17,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Searc
     <main>
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000000' }}>
-        <section style={{ maxWidth: '640px', margin: '0 auto', padding: '60px 24px' }}>
+        <section style={{ maxWidth: '640px', margin: '0 auto', padding: 'clamp(32px, 6vw, 60px) 24px' }}>
           <h1 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 330, margin: '0 0 12px' }}>
             Submit a Business
           </h1>
@@ -45,7 +45,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Searc
               <input type="text" name="name" required maxLength={200} placeholder="e.g. Aling Rosa Catering" className="input-dark" />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Category *</label>
                 <select name="categoryId" required className="input-dark">

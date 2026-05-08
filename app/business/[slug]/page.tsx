@@ -182,7 +182,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
             <h3 style={{ color: '#ffffff', fontSize: '18px', margin: '0 0 20px', fontWeight: 500 }}>Write a Review</h3>
             <form action="/api/reviews" method="POST">
               <input type="hidden" name="businessId" value={biz.id} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Your Name *</label>
                   <input type="text" name="reviewerName" required maxLength={100} placeholder="Maria Santos" className="input-dark" />
