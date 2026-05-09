@@ -3,7 +3,6 @@ import { db } from '@/lib/db'
 import { reviews, businesses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { auth } from '@/auth'
-import { notifyAdmin } from '@/lib/notify'
 
 export async function POST(request: NextRequest) {
   const session = await auth()
@@ -48,13 +47,6 @@ export async function POST(request: NextRequest) {
     .limit(1)
 
   const slug = biz?.slug ?? ''
-
-  notifyAdmin(
-    'New Review',
-    `<p><strong>${reviewerName.trim()}</strong> left a ${'★'.repeat(rating)} review on <strong>${biz?.name ?? businessId}</strong>.</p>
-     <p>"${body.trim()}"</p>
-     <p><a href="https://bisdak.co.nz/business/${slug}">View business</a></p>`
-  )
 
   return Response.redirect(new URL(`/business/${slug}`, request.url))
 }
