@@ -87,7 +87,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     .from(businesses)
     .leftJoin(categories, eq(businesses.categoryId, categories.id))
     .leftJoin(regions, eq(businesses.regionId, regions.id))
-    .orderBy(desc(businesses.createdAt))
+    .orderBy(desc(businesses.isPremium), desc(businesses.createdAt))
 
   const allPosts = await db
     .select()
