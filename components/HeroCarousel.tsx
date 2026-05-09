@@ -2,7 +2,7 @@
 import { useRef } from 'react'
 import InstallButton from './InstallButton'
 
-const HERO_VIDEO = 'https://yjotmehqsvojjoamwxak.supabase.co/storage/v1/object/public/photos/videos/jeepney.mp4'
+const HERO_VIDEO = 'https://yjotmehqsvojjoamwxak.supabase.co/storage/v1/object/public/photos/videos/jeepney2.mp4'
 
 export default function HeroCarousel() {
   return (
