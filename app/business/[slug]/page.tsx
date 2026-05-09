@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
+import ShareButton from '@/components/ShareButton'
 import { db } from '@/lib/db'
 import { reviews } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
@@ -29,9 +30,9 @@ export async function generateMetadata({ params }: { params: Params }) {
       description,
       url: `${BASE}/business/${slug}`,
       type: 'website',
-      ...(biz.photoUrl ? { images: [{ url: biz.photoUrl, alt: biz.name }] } : {}),
+      images: [{ url: `${BASE}/api/og/${slug}`, width: 1200, height: 630, alt: biz.name }],
     },
-    twitter: { card: 'summary', title, description },
+    twitter: { card: 'summary_large_image', title, description },
   }
 }
 
@@ -140,6 +141,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                   📍 Google Maps
                 </a>
               )}
+              <ShareButton slug={biz.slug} name={biz.name} />
             </div>
           </div>
         </section>
