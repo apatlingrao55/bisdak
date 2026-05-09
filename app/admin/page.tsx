@@ -1,25 +1,18 @@
 export const dynamic = 'force-dynamic'
 
-import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import ApproveAllButton from './ApproveAllButton'
 import BusinessFilter from './BusinessFilter'
 import { db } from '@/lib/db'
 import { submissions, reviews, posts, businessClaims, businesses, users, categories, regions } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
+import { isAdmin } from '@/lib/admin'
 
 type SearchParams = Promise<{ error?: string }>
 
-async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value ?? ''
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  return !!adminToken && session === adminToken
-}
-
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams
-  const authed = await isAuthenticated()
+  const authed = await isAdmin()
 
   if (!authed) {
     return (
