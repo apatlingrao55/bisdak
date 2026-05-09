@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
-import { reviews } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { reviews, businesses } from '@/lib/db/schema'
+import { eq, and } from 'drizzle-orm'
 import { auth } from '@/auth'
 
 export async function POST(
@@ -9,7 +9,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth()
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 })
   }
 
@@ -19,6 +19,27 @@ export async function POST(
 
   if (!response) {
     return new Response('Response text is required', { status: 400 })
+  }
+
+  // Verify the review belongs to a business owned by the user
+  const [review] = await db
+    .select({ id: reviews.id, businessId: reviews.businessId })
+    .from(reviews)
+    .where(eq(reviews.id, id))
+    .limit(1)
+
+  if (!review) {
+    return new Response('Review not found', { status: 404 })
+  }
+
+  const [biz] = await db
+    .select({ id: businesses.id })
+    .from(businesses)
+    .where(and(eq(businesses.id, review.businessId), eq(businesses.ownerId, session.user.id)))
+    .limit(1)
+
+  if (!biz) {
+    return new Response('Forbidden', { status: 403 })
   }
 
   await db
