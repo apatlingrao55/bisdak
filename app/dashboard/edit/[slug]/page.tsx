@@ -47,7 +47,7 @@ export default async function EditBusinessPage({ params }: { params: Params }) {
             Update your listing details. Changes go live immediately.
           </p>
 
-          <form action={`/api/businesses/${slug}/edit`} method="POST" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <form action={`/api/businesses/${slug}/edit`} method="POST" encType="multipart/form-data" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
               <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Business Name *</label>
               <input type="text" name="name" required maxLength={200} defaultValue={biz.name} className="input-dark" />
@@ -115,8 +115,15 @@ export default async function EditBusinessPage({ params }: { params: Params }) {
             </div>
 
             <div>
-              <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Photo URL</label>
-              <input type="url" name="photoUrl" maxLength={500} defaultValue={biz.photoUrl ?? ''} placeholder="https://example.com/photo.jpg" className="input-dark" />
+              <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Photo</label>
+              <input type="hidden" name="existingPhotoUrl" value={biz.photoUrl ?? ''} />
+              {biz.photoUrl && (
+                <div style={{ marginBottom: '8px' }}>
+                  <img src={biz.photoUrl} alt="Current photo" style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #1E2C31' }} />
+                </div>
+              )}
+              <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" className="input-dark" style={{ padding: '10px' }} />
+              <p style={{ color: '#52525B', fontSize: '12px', margin: '6px 0 0' }}>JPEG, PNG, or WebP. Max 5MB. Leave empty to keep current photo.</p>
             </div>
 
             <div>

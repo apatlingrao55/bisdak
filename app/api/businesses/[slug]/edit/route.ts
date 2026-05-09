@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 import { db } from '@/lib/db'
 import { businesses } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -68,9 +69,39 @@ export async function POST(
   const website = (formData.get('website') as string)?.trim().slice(0, 500) || null
   const facebookUrl = (formData.get('facebookUrl') as string)?.trim().slice(0, 500) || null
   const googleMapsUrl = (formData.get('googleMapsUrl') as string)?.trim().slice(0, 500) || null
-  const photoUrl = (formData.get('photoUrl') as string)?.trim().slice(0, 500) || null
   const openStatusRaw = (formData.get('openStatus') as string)?.trim() || null
   const openStatus = openStatusRaw === 'open' || openStatusRaw === 'closed' ? openStatusRaw : null
+
+  // Handle photo upload or keep existing
+  let photoUrl: string | null = (formData.get('existingPhotoUrl') as string)?.trim() || null
+  const photoFile = formData.get('photo') as File | null
+  if (photoFile && photoFile.size > 0) {
+    if (photoFile.size > 5 * 1024 * 1024) {
+      return new Response('Photo must be under 5MB', { status: 400 })
+    }
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(photoFile.type)) {
+      return new Response('Photo must be JPEG, PNG, or WebP', { status: 400 })
+    }
+    const ext = photoFile.type.split('/')[1] === 'jpeg' ? 'jpg' : photoFile.type.split('/')[1]
+    const fileName = `${biz.id}-${Date.now()}.${ext}`
+
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_KEY!,
+    )
+    const buffer = Buffer.from(await photoFile.arrayBuffer())
+    const { error: uploadError } = await supabase.storage
+      .from('photos')
+      .upload(fileName, buffer, { contentType: photoFile.type, upsert: true })
+
+    if (uploadError) {
+      return new Response(`Photo upload failed: ${uploadError.message}`, { status: 500 })
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(fileName)
+    photoUrl = publicUrl
+  }
 
   // Validate formats
   if (email && !isValidEmail(email)) {
@@ -84,9 +115,6 @@ export async function POST(
   }
   if (googleMapsUrl && !isValidUrl(googleMapsUrl)) {
     return new Response('Google Maps URL must be a valid HTTPS URL', { status: 400 })
-  }
-  if (photoUrl && !isValidUrl(photoUrl)) {
-    return new Response('Photo URL must be a valid HTTPS URL', { status: 400 })
   }
 
   // Admin updates by id only; owner updates with ownership check
