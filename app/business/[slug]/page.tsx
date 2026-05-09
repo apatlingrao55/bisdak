@@ -1,4 +1,4 @@
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
@@ -206,7 +206,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                 {!canReview && (
                   <p style={{ color: '#F59E0B', fontSize: '14px', margin: '0 0 16px', padding: '8px 12px', background: 'rgba(245,158,11,0.08)', borderRadius: '6px' }}>
                     {!userId
-                      ? <><a href="/auth/sign-in" style={{ color: '#36F4A4', textDecoration: 'none' }}>Sign in</a> with a verified email to leave a review.</>
+                      ? <><a href={`/auth/sign-in?callbackUrl=/business/${biz.slug}`} style={{ color: '#36F4A4', textDecoration: 'none' }}>Sign in</a> with a verified email to leave a review.</>
                       : <>Please <a href={`/auth/verify?email=${encodeURIComponent(session?.user?.email ?? '')}`} style={{ color: '#36F4A4', textDecoration: 'none' }}>verify your email</a> to leave a review.</>
                     }
                   </p>
