@@ -1,6 +1,32 @@
 import Nav from '@/components/Nav'
 
-export default function SignUpPage() {
+const errorMessages: Record<string, string> = {
+  missing: 'Please fill in all fields.',
+  password: 'Password must be at least 8 characters.',
+  exists: 'An account with this email already exists.',
+  'rate-limit': 'Too many attempts. Please try again in an hour.',
+}
+
+async function ErrorBanner({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams
+  if (!error) return null
+  const message = errorMessages[error] || 'Something went wrong.'
+  return (
+    <div style={{
+      background: 'rgba(239,68,68,0.1)',
+      border: '1px solid rgba(239,68,68,0.3)',
+      borderRadius: 8,
+      padding: '10px 14px',
+      marginBottom: 16,
+      color: '#F87171',
+      fontSize: 14,
+    }}>
+      {message}
+    </div>
+  )
+}
+
+export default function SignUpPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   return (
     <main>
       <Nav />
@@ -22,6 +48,8 @@ export default function SignUpPage() {
             <p style={{ color: '#A1A1AA', fontSize: '15px', margin: '0 0 32px' }}>
               List your Filipino business for free.
             </p>
+
+            <ErrorBanner searchParams={searchParams} />
 
             <form action="/api/auth/register" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>

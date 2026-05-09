@@ -20,7 +20,12 @@ export async function POST(request: NextRequest) {
     .limit(1)
 
   if (user) {
-    await createAndSendOTP(email, 'password-reset')
+    const otpResult = await createAndSendOTP(email, 'password-reset')
+    if (otpResult.error) {
+      return Response.redirect(
+        new URL('/auth/forgot-password?error=rate-limit', request.url)
+      )
+    }
   }
 
   // Always redirect to verify step (anti-enumeration)

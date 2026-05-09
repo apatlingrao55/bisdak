@@ -4,7 +4,7 @@ import { eq, and, gt, sql } from 'drizzle-orm'
 import { generateOTP, hashOTP, verifyOTPHash, sendOTPEmail } from '@/lib/email'
 
 export async function createAndSendOTP(email: string, purpose: 'registration' | 'claiming' | 'password-reset') {
-  // Rate limit: max 3 per email per hour (includes initial send)
+  // Rate limit: max 5 per email per hour (includes initial send)
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
   const recentCount = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -16,7 +16,7 @@ export async function createAndSendOTP(email: string, purpose: 'registration' | 
       )
     )
 
-  if (recentCount[0].count >= 3) {
+  if (recentCount[0].count >= 5) {
     return { error: 'Too many requests. Try again later.' }
   }
 

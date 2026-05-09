@@ -38,7 +38,11 @@ export async function POST(request: NextRequest) {
     passwordHash,
   })
 
-  await createAndSendOTP(email, 'registration')
+  const otpResult = await createAndSendOTP(email, 'registration')
+
+  if (otpResult.error) {
+    return Response.redirect(new URL('/auth/sign-up?error=rate-limit', request.url))
+  }
 
   return Response.redirect(
     new URL(`/auth/verify?email=${encodeURIComponent(email)}`, request.url)
