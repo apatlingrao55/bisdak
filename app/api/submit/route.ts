@@ -2,13 +2,10 @@ import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { submissions } from '@/lib/db/schema'
 import { notifyAdmin } from '@/lib/notify'
+import { slugify } from '@/lib/slugify'
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    + '-' + Date.now()
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export async function POST(request: NextRequest) {
@@ -39,9 +36,9 @@ export async function POST(request: NextRequest) {
 
   notifyAdmin(
     'New Business Submission',
-    `<p><strong>${name}</strong> was submitted for review.</p>
-     <p>${[phone, website, submitterEmail].filter(Boolean).join(' · ')}</p>
-     ${description ? `<p>${description}</p>` : ''}
+    `<p><strong>${escapeHtml(name)}</strong> was submitted for review.</p>
+     <p>${[phone, website, submitterEmail].filter(Boolean).map(s => escapeHtml(s!)).join(' · ')}</p>
+     ${description ? `<p>${escapeHtml(description)}</p>` : ''}
      <p><a href="https://bisdak.co.nz/admin">Review in admin panel</a></p>`
   )
 

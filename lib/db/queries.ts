@@ -1,10 +1,11 @@
+import { cache } from 'react'
 import { db } from '@/lib/db'
 import { businesses, categories, regions, reviews } from '@/lib/db/schema'
 import { eq, and, like, or, desc, asc, sql } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 
-/** Full business by slug (active only) — used by detail page, API route, OG endpoint */
-export async function getBusinessBySlug(slug: string) {
+/** Full business by slug (active only) — deduplicated per request via React cache */
+export const getBusinessBySlug = cache(async function getBusinessBySlug(slug: string) {
   const [biz] = await db
     .select({
       id: businesses.id,
@@ -31,7 +32,7 @@ export async function getBusinessBySlug(slug: string) {
     .where(and(eq(businesses.slug, slug), eq(businesses.status, 'active')))
     .limit(1)
   return biz ?? null
-}
+})
 
 /** Card-shaped projection with aggregates — used by homepage, search */
 export async function getBusinessCards(options?: {

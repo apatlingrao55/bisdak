@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { getBusinessBySlug } from '@/lib/db/queries'
+import { getCategoryColor } from '@/lib/category-color'
 
 export const runtime = 'nodejs'
 
@@ -12,13 +13,6 @@ async function loadFont(): Promise<Buffer> {
   const data = await readFile(join(process.cwd(), 'assets/fonts/Inter-SemiBold.ttf'))
   fontCache = data
   return data
-}
-
-function getCategoryColor(name?: string | null): string {
-  if (!name) return '#1E2C31'
-  let hash = 0
-  for (const ch of name) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0
-  return `hsl(${Math.abs(hash) % 360}, 55%, 45%)`
 }
 
 function truncate(str: string, max: number): string {

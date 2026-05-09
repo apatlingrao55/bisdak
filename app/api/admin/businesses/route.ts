@@ -1,15 +1,8 @@
 import { NextRequest } from 'next/server'
-import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 import { businesses, reviews, businessClaims } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-
-async function isAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value ?? ''
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  return !!adminToken && session === adminToken
-}
+import { isAdmin } from '@/lib/admin'
 
 export async function DELETE(request: NextRequest) {
   if (!(await isAdmin())) {

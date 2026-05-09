@@ -110,10 +110,11 @@ export async function POST(request: NextRequest) {
     message,
   })
 
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
   notifyAdmin(
     'New Business Claim',
-    `<p><strong>${session.user.email}</strong> wants to claim <strong>${biz.name}</strong>.</p>
-     ${message ? `<p>Message: "${message}"</p>` : ''}
+    `<p><strong>${esc(session.user.email!)}</strong> wants to claim <strong>${esc(biz.name)}</strong>.</p>
+     ${message ? `<p>Message: &quot;${esc(message)}&quot;</p>` : ''}
      <p><a href="https://bisdak.co.nz/admin">Review in admin panel</a></p>`
   )
 

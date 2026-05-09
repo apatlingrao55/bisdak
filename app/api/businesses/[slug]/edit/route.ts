@@ -1,17 +1,10 @@
 import { NextRequest } from 'next/server'
-import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { db } from '@/lib/db'
 import { businesses } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { auth } from '@/auth'
-
-async function isAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value ?? ''
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  return !!adminToken && session === adminToken
-}
+import { isAdmin } from '@/lib/admin'
 
 function isValidUrl(str: string): boolean {
   try {

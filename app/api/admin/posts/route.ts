@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { posts } from '@/lib/db/schema'
-
-function isAuthorized(req: NextRequest): boolean {
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  if (!adminToken) return false
-  return (req.cookies.get('admin_session')?.value ?? '') === adminToken
-}
+import { isAdmin } from '@/lib/admin'
 
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

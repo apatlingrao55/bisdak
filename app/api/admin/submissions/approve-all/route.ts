@@ -2,23 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { submissions, businesses } from '@/lib/db/schema'
 import { eq, inArray } from 'drizzle-orm'
-
-function isAuthorized(req: NextRequest): boolean {
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  if (!adminToken) return false
-  return (req.cookies.get('admin_session')?.value ?? '') === adminToken
-}
-
-function slugify(text: string, suffix: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    + '-' + suffix
-}
+import { isAdmin } from '@/lib/admin'
+import { slugify } from '@/lib/slugify'
 
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!(await isAdmin())) {
     return NextResponse.redirect(new URL('/admin?error=unauthorized', req.url))
   }
 

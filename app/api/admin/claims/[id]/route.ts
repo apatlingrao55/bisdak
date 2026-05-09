@@ -2,19 +2,13 @@ import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { businessClaims, businesses } from '@/lib/db/schema'
 import { eq, and, isNull, ne } from 'drizzle-orm'
-
-function isAuthorized(req: NextRequest): boolean {
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  if (!adminToken) return false
-  const cookieToken = req.cookies.get('admin_session')?.value ?? ''
-  return cookieToken === adminToken
-}
+import { isAdmin } from '@/lib/admin'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAuthorized(request)) {
+  if (!(await isAdmin())) {
     return Response.redirect(new URL('/admin?error=unauthorized', request.url))
   }
 

@@ -1,19 +1,12 @@
 export const dynamic = 'force-dynamic'
 
-import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { businesses, categories, regions } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
-
-async function isAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const session = cookieStore.get('admin_session')?.value ?? ''
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  return !!adminToken && session === adminToken
-}
+import { isAdmin } from '@/lib/admin'
 
 type Params = Promise<{ slug: string }>
 

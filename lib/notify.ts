@@ -1,10 +1,6 @@
-import { Resend } from 'resend'
+import { getResend } from '@/lib/resend'
 
 const ADMIN_EMAIL = 'alex@aiconsult.co.nz'
-
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY)
-}
 
 export async function notifyAdmin(subject: string, html: string) {
   try {
@@ -14,8 +10,7 @@ export async function notifyAdmin(subject: string, html: string) {
       subject: `[BisDak] ${subject}`,
       html,
     })
-  } catch {
-    // Don't fail the request if notification fails
-    console.error('Failed to send admin notification:', subject)
+  } catch (err) {
+    console.error('Failed to send admin notification:', subject, err)
   }
 }

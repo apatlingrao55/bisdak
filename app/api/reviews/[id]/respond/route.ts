@@ -47,6 +47,9 @@ export async function POST(
     .set({ ownerResponse: response.slice(0, 500) })
     .where(eq(reviews.id, id))
 
-  const referer = request.headers.get('referer') ?? '/dashboard'
-  return Response.redirect(referer, 302)
+  const referer = request.headers.get('referer')
+  if (referer && referer.startsWith(new URL('/', request.url).origin)) {
+    return Response.redirect(referer, 302)
+  }
+  return Response.redirect(new URL('/dashboard', request.url), 302)
 }

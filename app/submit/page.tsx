@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 import Nav from '@/components/Nav'
 import { db } from '@/lib/db'

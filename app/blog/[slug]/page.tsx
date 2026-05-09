@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 import Nav from '@/components/Nav'
 import { db } from '@/lib/db'
@@ -16,6 +16,14 @@ export async function generateMetadata({ params }: Props) {
   return { title: `${post.title} — BisDak`, description: post.excerpt }
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 function renderContent(content: string) {
   return content
     .split('\n')
@@ -29,7 +37,13 @@ function renderContent(content: string) {
       if (line.trim() === '') {
         return <div key={i} style={{ height: '12px' }} />
       }
-      const withLinks = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2" style="color:#36F4A4;text-decoration:none;">$1</a>`)
+      // Escape HTML first, then apply safe markdown transformations
+      const escaped = escapeHtml(line)
+      const withLinks = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+        // Only allow http/https links
+        if (!/^https?:\/\//.test(url)) return text
+        return `<a href="${url}" style="color:#36F4A4;text-decoration:none;">${text}</a>`
+      })
       const withBold = withLinks.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       const withItalic = withBold.replace(/\*([^*]+)\*/g, '<em>$1</em>')
       return (

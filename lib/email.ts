@@ -1,9 +1,5 @@
-import { Resend } from 'resend'
 import crypto from 'crypto'
-
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY)
-}
+import { getResend } from '@/lib/resend'
 
 export function generateOTP(): { code: string; hash: string } {
   const code = String(crypto.randomInt(100000, 999999))

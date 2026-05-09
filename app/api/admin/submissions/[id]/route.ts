@@ -2,25 +2,11 @@ import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { submissions, businesses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { isAdmin } from '@/lib/admin'
+import { slugify } from '@/lib/slugify'
 
-function isAuthorized(req: NextRequest, token?: string): boolean {
-  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
-  if (!adminToken) return false
-  const cookieToken = req.cookies.get('admin_session')?.value ?? ''
-  if (cookieToken === adminToken) return true
-  return (token ?? '').trim() === adminToken
-}
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    + '-' + Date.now()
-}
-
-async function processApproval(subId: string, status: string, req: NextRequest, redirectUrl: URL | null, token?: string) {
-  if (!isAuthorized(req, token)) {
+async function processApproval(subId: string, status: string, req: NextRequest, redirectUrl: URL | null) {
+  if (!(await isAdmin())) {
     if (redirectUrl) return Response.redirect(new URL('/admin?error=unauthorized', req.url))
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -58,14 +44,14 @@ async function processApproval(subId: string, status: string, req: NextRequest, 
   return Response.json({ success: true })
 }
 
-// JSON PATCH from API clients
+// JSON PATCH from API clients — cookie auth only, no body token
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
   const body = await request.json().catch(() => ({}))
-  return processApproval(id, body.status ?? '', request, null, body.token)
+  return processApproval(id, body.status ?? '', request, null)
 }
 
 // Form POST from admin page

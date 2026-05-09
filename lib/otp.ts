@@ -72,8 +72,22 @@ export async function verifyOTP(
     return { error: 'No active code. Request a new one.' }
   }
 
-  // Check max attempts (5) before comparing
-  if (record.attempts! >= 5) {
+  // Atomically increment attempts and check limit in one query
+  // Returns the row only if attempts < 5 (before increment)
+  const [updated] = await db
+    .update(emailVerifications)
+    .set({ attempts: sql`attempts + 1` })
+    .where(
+      and(
+        eq(emailVerifications.id, record.id),
+        eq(emailVerifications.used, false),
+        sql`attempts < 5`
+      )
+    )
+    .returning({ id: emailVerifications.id, attempts: emailVerifications.attempts })
+
+  if (!updated) {
+    // Either already used or max attempts reached
     await db
       .update(emailVerifications)
       .set({ used: true })
@@ -84,12 +98,7 @@ export async function verifyOTP(
   // Timing-safe hash comparison
   const submittedHash = hashOTP(code)
   if (!verifyOTPHash(submittedHash, record.codeHash)) {
-    await db
-      .update(emailVerifications)
-      .set({ attempts: sql`attempts + 1` })
-      .where(eq(emailVerifications.id, record.id))
-
-    const remaining = 4 - record.attempts!
+    const remaining = 5 - updated.attempts!
     if (remaining <= 0) {
       await db
         .update(emailVerifications)
