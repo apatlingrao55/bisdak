@@ -57,6 +57,21 @@ export default function SignUpPage() {
                   className="input-dark"
                 />
               </div>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginTop: 4 }}>
+                <input
+                  type="checkbox"
+                  name="agreeTerms"
+                  required
+                  value="yes"
+                  style={{ marginTop: 3, accentColor: '#36F4A4', width: 16, height: 16, flexShrink: 0 }}
+                />
+                <span style={{ color: '#A1A1AA', fontSize: 13, lineHeight: 1.5 }}>
+                  I agree to the{' '}
+                  <a href="/terms" target="_blank" style={{ color: '#36F4A4', textDecoration: 'none' }}>Terms of Use</a>
+                  {' '}and{' '}
+                  <a href="/privacy" target="_blank" style={{ color: '#36F4A4', textDecoration: 'none' }}>Privacy Policy</a>
+                </span>
+              </label>
               <button type="submit" className="btn-primary" style={{ height: '48px', marginTop: '8px' }}>
                 Create Account
               </button>

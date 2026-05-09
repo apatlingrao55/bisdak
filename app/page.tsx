@@ -136,11 +136,20 @@ export default async function HomePage() {
       </section>
 
       <footer style={{ background: '#000000', padding: '28px clamp(32px, 6vw, 64px)', textAlign: 'center', borderTop: '1px solid #1E2C31' }}>
-        <p style={{ color: '#52525B', fontSize: '14px', margin: 0 }}>
+        <p style={{ color: '#52525B', fontSize: '14px', margin: '0 0 8px' }}>
           © 2026 BisDak Pinoy Business Hub · bisdak.co.nz ·{' '}
           <a href="/submit" style={{ color: '#71717A', textDecoration: 'none' }}>Submit a Business</a>
           {' · '}
           <a href="/admin" style={{ color: '#71717A', textDecoration: 'none' }}>Admin</a>
+        </p>
+        <p style={{ color: '#3F3F46', fontSize: '12px', margin: 0 }}>
+          <a href="/terms" style={{ color: '#52525B', textDecoration: 'none' }}>Terms</a>
+          {' · '}
+          <a href="/privacy" style={{ color: '#52525B', textDecoration: 'none' }}>Privacy</a>
+          {' · '}
+          <a href="/cookies" style={{ color: '#52525B', textDecoration: 'none' }}>Cookies</a>
+          {' · '}
+          <a href="/disclaimer" style={{ color: '#52525B', textDecoration: 'none' }}>Disclaimer</a>
         </p>
       </footer>
     </main>

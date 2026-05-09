@@ -10,8 +10,9 @@ export async function POST(request: NextRequest) {
   const name = (formData.get('name') as string)?.trim()
   const email = (formData.get('email') as string)?.trim()
   const password = formData.get('password') as string
+  const agreeTerms = formData.get('agreeTerms') as string
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || agreeTerms !== 'yes') {
     return Response.redirect(new URL('/auth/sign-up?error=missing', request.url))
   }
 
