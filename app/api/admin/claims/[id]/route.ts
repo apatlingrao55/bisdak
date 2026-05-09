@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { businessClaims, businesses } from '@/lib/db/schema'
-import { eq, and, isNull } from 'drizzle-orm'
+import { eq, and, isNull, ne } from 'drizzle-orm'
 
 function isAuthorized(req: NextRequest): boolean {
   const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
@@ -44,6 +44,16 @@ export async function POST(
       .where(and(
         eq(businesses.id, claim.businessId),
         isNull(businesses.ownerId),
+      ))
+
+    // Auto-reject other pending claims for the same business
+    await db
+      .update(businessClaims)
+      .set({ status: 'rejected' })
+      .where(and(
+        eq(businessClaims.businessId, claim.businessId),
+        eq(businessClaims.status, 'pending'),
+        ne(businessClaims.id, id),
       ))
   }
 
