@@ -234,7 +234,7 @@ export default function HeroCarousel() {
       <div style={{ position: 'absolute', inset: 0, background: s.bg, transition: 'background 600ms ease' }} />
 
       {/* Icon — hidden on mobile to avoid overlap */}
-      <div className="hidden sm:block" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 'clamp(200px, 34vw, 460px)', height: 'clamp(200px, 34vw, 460px)', opacity: 0.8, pointerEvents: 'none' }}>
+      <div className="hidden sm:block" style={{ position: 'absolute', right: 'clamp(32px, 6vw, 64px)', top: '50%', transform: 'translateY(-50%)', width: 'clamp(200px, 34vw, 460px)', height: 'clamp(200px, 34vw, 460px)', opacity: 0.8, pointerEvents: 'none' }}>
         {s.icon}
       </div>
 
