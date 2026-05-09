@@ -198,46 +198,61 @@ export default async function BusinessPage({ params }: { params: Params }) {
           </div>
 
           {/* Write a review */}
-          <div style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '28px', marginBottom: '40px' }} className="shadow-card">
-            <h3 style={{ color: '#ffffff', fontSize: '18px', margin: '0 0 20px', fontWeight: 500 }}>Write a Review</h3>
-            <form action="/api/reviews" method="POST">
-              <input type="hidden" name="businessId" value={biz.id} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Your Name *</label>
-                  <input type="text" name="reviewerName" required maxLength={100} placeholder="Maria Santos" className="input-dark" />
-                </div>
-                <div>
-                  <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Suburb *</label>
-                  <input type="text" name="suburb" required maxLength={100} placeholder="Manukau" className="input-dark" />
-                </div>
+          {(() => {
+            const canReview = !!(userId && session?.user?.emailVerified)
+            return (
+              <div style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '28px', marginBottom: '40px', opacity: canReview ? 1 : 0.5 }} className="shadow-card">
+                <h3 style={{ color: '#ffffff', fontSize: '18px', margin: '0 0 20px', fontWeight: 500 }}>Write a Review</h3>
+                {!canReview && (
+                  <p style={{ color: '#F59E0B', fontSize: '14px', margin: '0 0 16px', padding: '8px 12px', background: 'rgba(245,158,11,0.08)', borderRadius: '6px' }}>
+                    {!userId
+                      ? <><a href="/auth/sign-in" style={{ color: '#36F4A4', textDecoration: 'none' }}>Sign in</a> with a verified email to leave a review.</>
+                      : <>Please <a href={`/auth/verify?email=${encodeURIComponent(session?.user?.email ?? '')}`} style={{ color: '#36F4A4', textDecoration: 'none' }}>verify your email</a> to leave a review.</>
+                    }
+                  </p>
+                )}
+                <fieldset disabled={!canReview} style={{ border: 'none', padding: 0, margin: 0 }}>
+                  <form action="/api/reviews" method="POST">
+                    <input type="hidden" name="businessId" value={biz.id} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Your Name *</label>
+                        <input type="text" name="reviewerName" required maxLength={100} placeholder="Maria Santos" className="input-dark" />
+                      </div>
+                      <div>
+                        <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Suburb *</label>
+                        <input type="text" name="suburb" required maxLength={100} placeholder="Manukau" className="input-dark" />
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Rating *</label>
+                      <select name="rating" required className="input-dark">
+                        <option value="">Select rating</option>
+                        <option value="5">★★★★★ Excellent</option>
+                        <option value="4">★★★★ Good</option>
+                        <option value="3">★★★ Average</option>
+                        <option value="2">★★ Poor</option>
+                        <option value="1">★ Terrible</option>
+                      </select>
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Review (max 300 chars) *</label>
+                      <textarea
+                        name="body"
+                        required
+                        maxLength={300}
+                        rows={3}
+                        placeholder="Share your experience..."
+                        className="input-dark"
+                        style={{ resize: 'vertical' }}
+                      />
+                    </div>
+                    <button type="submit" className="btn-primary">Submit Review</button>
+                  </form>
+                </fieldset>
               </div>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Rating *</label>
-                <select name="rating" required className="input-dark">
-                  <option value="">Select rating</option>
-                  <option value="5">★★★★★ Excellent</option>
-                  <option value="4">★★★★ Good</option>
-                  <option value="3">★★★ Average</option>
-                  <option value="2">★★ Poor</option>
-                  <option value="1">★ Terrible</option>
-                </select>
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Review (max 300 chars) *</label>
-                <textarea
-                  name="body"
-                  required
-                  maxLength={300}
-                  rows={3}
-                  placeholder="Share your experience..."
-                  className="input-dark"
-                  style={{ resize: 'vertical' }}
-                />
-              </div>
-              <button type="submit" className="btn-primary">Submit Review</button>
-            </form>
-          </div>
+            )
+          })()}
 
           {/* Review list */}
           {bizReviews.length === 0 ? (
