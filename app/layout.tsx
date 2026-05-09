@@ -54,7 +54,8 @@ export default function RootLayout({
         <Providers>{children}</Providers>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`,
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}
+document.addEventListener('submit',function(e){var b=e.target.querySelector('button[type="submit"]');if(b){b.disabled=true;b.style.opacity='0.5'}})`,
           }}
         />
       </body>
