@@ -8,7 +8,7 @@ export default defineConfig({
   workers: 2,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'https://bisdak.co.nz',
     trace: 'off',
   },
   projects: [
