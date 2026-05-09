@@ -115,7 +115,17 @@ export default async function BusinessPage({ params }: { params: Params }) {
         background: biz.photoUrl ? '#1E2C31' : getCategoryColor(biz.categoryName),
         marginTop: '64px',
       }}>
-        {biz.photoUrl ? (
+        {biz.videoUrl ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          >
+            <source src={biz.videoUrl} type="video/mp4" />
+          </video>
+        ) : biz.photoUrl ? (
           <img
             src={biz.photoUrl}
             alt={biz.name}

@@ -22,6 +22,7 @@ export const getBusinessBySlug = cache(async function getBusinessBySlug(slug: st
       openStatus: businesses.openStatus,
       ownerId: businesses.ownerId,
       isPremium: businesses.isPremium,
+      videoUrl: businesses.videoUrl,
       categoryName: categories.name,
       categorySlug: categories.slug,
       categoryIcon: categories.icon,
