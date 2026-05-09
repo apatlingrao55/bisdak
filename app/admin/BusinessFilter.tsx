@@ -65,6 +65,29 @@ export default function BusinessFilter({ businesses }: { businesses: Business[] 
               <a href={`/business/${biz.slug}`} target="_blank" style={{ color: '#71717A', fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '8px 12px', border: '1px solid #3F3F46', borderRadius: '9999px' }}>
                 View
               </a>
+              <button
+                onClick={async () => {
+                  if (!confirm(`Delete "${biz.name}"? This also removes its reviews and claims. This cannot be undone.`)) return
+                  const res = await fetch('/api/admin/businesses', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: biz.id }),
+                  })
+                  if (res.ok) window.location.reload()
+                  else alert('Failed to delete business')
+                }}
+                style={{
+                  background: 'transparent',
+                  color: '#F87171',
+                  border: '1px solid rgba(248,113,113,0.3)',
+                  borderRadius: '9999px',
+                  padding: '8px 12px',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                Delete
+              </button>
             </div>
           </div>
         ))}
