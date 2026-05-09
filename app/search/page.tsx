@@ -5,7 +5,7 @@ import BusinessCard from '@/components/BusinessCard'
 import SearchBar from '@/components/SearchBar'
 import { db } from '@/lib/db'
 import { businesses, categories, regions } from '@/lib/db/schema'
-import { eq, like, or } from 'drizzle-orm'
+import { eq, ilike, or } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 import { getBusinessCards } from '@/lib/db/queries'
 
@@ -30,8 +30,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
 
   if (q.trim()) {
     const searchCond = or(
-      like(businesses.name, `%${q}%`),
-      like(businesses.description, `%${q}%`)
+      ilike(businesses.name, `%${q}%`),
+      ilike(businesses.description, `%${q}%`)
     )
     if (searchCond) conditions.push(searchCond as SQL)
   }
