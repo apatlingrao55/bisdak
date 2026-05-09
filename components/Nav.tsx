@@ -42,7 +42,7 @@ export default function Nav() {
       </Link>
 
       {/* Desktop nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }} className="hidden md:flex">
+      <div style={{ alignItems: 'center', gap: '28px' }} className="hidden md:flex">
         <Link href="/search" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
           Browse
         </Link>
