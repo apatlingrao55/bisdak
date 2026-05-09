@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import ApproveAllButton from './ApproveAllButton'
 import { db } from '@/lib/db'
-import { submissions, reviews, posts, businessClaims, businesses, users } from '@/lib/db/schema'
+import { submissions, reviews, posts, businessClaims, businesses, users, categories, regions } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 
 type SearchParams = Promise<{ error?: string }>
@@ -78,6 +78,21 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     .innerJoin(users, eq(businessClaims.userId, users.id))
     .where(eq(businessClaims.status, 'pending'))
     .orderBy(businessClaims.createdAt)
+
+  const allBusinesses = await db
+    .select({
+      id: businesses.id,
+      name: businesses.name,
+      slug: businesses.slug,
+      status: businesses.status,
+      categoryName: categories.name,
+      regionName: regions.name,
+      ownerId: businesses.ownerId,
+    })
+    .from(businesses)
+    .leftJoin(categories, eq(businesses.categoryId, categories.id))
+    .leftJoin(regions, eq(businesses.regionId, regions.id))
+    .orderBy(desc(businesses.createdAt))
 
   const allPosts = await db
     .select()
@@ -227,6 +242,43 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
                 ))}
               </div>
             )}
+          </section>
+
+          {/* All Businesses */}
+          <section style={{ marginBottom: '64px' }}>
+            <h2 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 400, margin: '0 0 24px' }}>
+              All Businesses ({allBusinesses.length})
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {allBusinesses.map(biz => (
+                <div key={biz.id} style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ color: '#ffffff', fontWeight: 500, fontSize: '16px' }}>{biz.name}</span>
+                    <span style={{ color: '#52525B', fontSize: '13px', marginLeft: '12px' }}>
+                      {[biz.categoryName, biz.regionName].filter(Boolean).join(' · ')}
+                    </span>
+                    <div style={{ marginTop: '4px', display: 'flex', gap: '8px' }}>
+                      <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: biz.status === 'active' ? 'rgba(54,244,164,0.1)' : 'rgba(113,113,122,0.2)', color: biz.status === 'active' ? '#36F4A4' : '#71717A' }}>
+                        {biz.status}
+                      </span>
+                      {biz.ownerId && (
+                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: 'rgba(96,165,250,0.1)', color: '#60A5FA' }}>
+                          claimed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                    <a href={`/dashboard/edit/${biz.slug}`} className="btn-primary" style={{ padding: '8px 16px', fontSize: '14px', textDecoration: 'none' }}>
+                      Edit
+                    </a>
+                    <a href={`/business/${biz.slug}`} target="_blank" style={{ color: '#71717A', fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', padding: '8px 12px', border: '1px solid #3F3F46', borderRadius: '9999px' }}>
+                      View →
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
           {/* Blog posts */}
