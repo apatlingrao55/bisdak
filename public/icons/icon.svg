@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Option 3: Circle with flag bands — clean, modern -->
+  <rect width="512" height="512" rx="96" fill="#02090A"/>
+  <!-- Outer circle -->
+  <circle cx="256" cy="240" r="170" fill="none" stroke="#FCD116" stroke-width="6"/>
+  <!-- Top half - blue -->
+  <path d="M86 240 A170 170 0 0 1 426 240 Z" fill="#0038A8"/>
+  <!-- Bottom half - red -->
+  <path d="M86 240 A170 170 0 0 0 426 240 Z" fill="#CE1126"/>
+  <!-- Center sun -->
+  <circle cx="256" cy="240" r="45" fill="#FCD116"/>
+  <circle cx="256" cy="240" r="28" fill="#FFFFFF"/>
+  <circle cx="256" cy="240" r="20" fill="#FCD116"/>
+  <!-- 8 sun rays -->
+  <g stroke="#FCD116" stroke-width="6" stroke-linecap="round">
+    <line x1="256" y1="185" x2="256" y2="165"/>
+    <line x1="256" y1="295" x2="256" y2="315"/>
+    <line x1="201" y1="240" x2="181" y2="240"/>
+    <line x1="311" y1="240" x2="331" y2="240"/>
+    <line x1="217" y1="201" x2="203" y2="187"/>
+    <line x1="295" y1="201" x2="309" y2="187"/>
+    <line x1="217" y1="279" x2="203" y2="293"/>
+    <line x1="295" y1="279" x2="309" y2="293"/>
+  </g>
+  <!-- Text below -->
+  <text x="256" y="460" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="700" fill="#FFFFFF" letter-spacing="6">BISDAK</text>
+</svg>

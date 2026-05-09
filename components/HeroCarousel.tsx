@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import InstallButton from './InstallButton'
 
 const slides = [
   {
@@ -243,7 +244,10 @@ export default function HeroCarousel() {
         <p style={{ color: s.accent, fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', fontWeight: 600, margin: '0 0 16px' }}>{s.label}</p>
         <h1 style={{ fontSize: 'clamp(40px, 7vw, 84px)', fontWeight: 330, lineHeight: 1.02, color: '#fff', margin: '0 0 20px', maxWidth: 620, whiteSpace: 'pre-line' }}>{s.title}</h1>
         <p style={{ color: '#A1A1AA', fontSize: 'clamp(15px, 2vw, 19px)', margin: '0 0 36px', maxWidth: 460, lineHeight: 1.55 }}>{s.subtitle}</p>
-        <a href={s.href} className="btn-primary" style={{ fontSize: 16, padding: '13px 28px' }}>{s.cta} →</a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <a href={s.href} className="btn-primary" style={{ fontSize: 16, padding: '13px 28px' }}>{s.cta} →</a>
+          <InstallButton />
+        </div>
       </div>
 
       {/* Dots */}

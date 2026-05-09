@@ -1,0 +1,27 @@
+{
+  "name": "BisDak — Pinoy Business Hub NZ",
+  "short_name": "BisDak",
+  "description": "New Zealand's definitive directory of Filipino-owned businesses.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#02090A",
+  "theme_color": "#02090A",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
