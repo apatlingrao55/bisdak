@@ -42,7 +42,7 @@ export default function Nav() {
       </Link>
 
       {/* Desktop nav */}
-      <div style={{ alignItems: 'center', gap: '28px' }} className="hidden md:flex">
+      <div className="nav-desktop">
         <Link href="/search" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
           Browse
         </Link>
@@ -82,7 +82,7 @@ export default function Nav() {
         onClick={() => setMenuOpen(!menuOpen)}
         style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '22px', cursor: 'pointer', padding: '4px' }}
         aria-label="Toggle navigation menu"
-        className="flex md:hidden"
+        className="nav-mobile-toggle"
       >
         {menuOpen ? '✕' : '☰'}
       </button>
@@ -97,7 +97,7 @@ export default function Nav() {
           display: 'flex',
           flexDirection: 'column',
           gap: '28px',
-        }} className="md:hidden">
+        }} className="nav-mobile-overlay">
           <Link href="/search" onClick={() => setMenuOpen(false)} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '24px', fontWeight: 300 }}>
             Browse
           </Link>

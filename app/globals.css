@@ -130,6 +130,29 @@ select.input-dark {
   cursor: pointer;
 }
 
+/* Nav responsive */
+.nav-desktop {
+  display: none;
+  align-items: center;
+  gap: 28px;
+}
+.nav-mobile-toggle {
+  display: flex;
+}
+.nav-mobile-overlay {}
+
+@media (min-width: 768px) {
+  .nav-desktop {
+    display: flex;
+  }
+  .nav-mobile-toggle {
+    display: none !important;
+  }
+  .nav-mobile-overlay {
+    display: none !important;
+  }
+}
+
 /* Carousel slide-in animation */
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(12px); }
