@@ -27,7 +27,7 @@ export function verifyOTPHash(submitted: string, stored: string): boolean {
 
 export async function sendOTPEmail(email: string, code: string) {
   const { error } = await getResend().emails.send({
-    from: 'BisDak <onboarding@resend.dev>',
+    from: 'BisDak <noreply@bisdak.co.nz>',
     to: email,
     subject: 'Your BisDak verification code',
     html: `<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
