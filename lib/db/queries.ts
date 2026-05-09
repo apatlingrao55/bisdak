@@ -19,6 +19,7 @@ export async function getBusinessBySlug(slug: string) {
       isFilipino: businesses.isFilipino,
       photoUrl: businesses.photoUrl,
       openStatus: businesses.openStatus,
+      ownerId: businesses.ownerId,
       categoryName: categories.name,
       categorySlug: categories.slug,
       categoryIcon: categories.icon,
