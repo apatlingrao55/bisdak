@@ -52,7 +52,11 @@ export default function SignInPage() {
               </button>
             </form>
 
-            <p style={{ color: '#71717A', fontSize: '14px', textAlign: 'center', margin: '24px 0 0' }}>
+            <p style={{ color: '#71717A', fontSize: '14px', textAlign: 'center', margin: '20px 0 0' }}>
+              <a href="/auth/forgot-password" style={{ color: '#A1A1AA', textDecoration: 'none', fontSize: '13px' }}>Forgot password?</a>
+            </p>
+
+            <p style={{ color: '#71717A', fontSize: '14px', textAlign: 'center', margin: '16px 0 0' }}>
               Don&apos;t have an account?{' '}
               <a href="/auth/sign-up" style={{ color: '#36F4A4', textDecoration: 'none' }}>Sign up free</a>
             </p>

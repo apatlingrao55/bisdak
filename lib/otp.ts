@@ -3,7 +3,7 @@ import { emailVerifications } from '@/lib/db/schema'
 import { eq, and, gt, sql } from 'drizzle-orm'
 import { generateOTP, hashOTP, verifyOTPHash, sendOTPEmail } from '@/lib/email'
 
-export async function createAndSendOTP(email: string, purpose: 'registration' | 'claiming') {
+export async function createAndSendOTP(email: string, purpose: 'registration' | 'claiming' | 'password-reset') {
   // Rate limit: max 3 per email per hour (includes initial send)
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
   const recentCount = await db
@@ -49,7 +49,7 @@ export async function createAndSendOTP(email: string, purpose: 'registration' | 
 export async function verifyOTP(
   email: string,
   code: string,
-  purpose: 'registration' | 'claiming'
+  purpose: 'registration' | 'claiming' | 'password-reset'
 ) {
   const now = new Date()
 
