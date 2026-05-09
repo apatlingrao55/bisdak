@@ -5,6 +5,7 @@ export const users = pgTable('users', {
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash'),
   name: text('name'),
+  emailVerified: timestamp('email_verified'),
   createdAt: timestamp('created_at').defaultNow(),
 })
 
@@ -115,4 +116,15 @@ export const verificationTokens = pgTable('verification_tokens', {
   identifier: text('identifier').notNull(),
   token: text('token').notNull(),
   expires: timestamp('expires').notNull(),
+})
+
+export const emailVerifications = pgTable('email_verifications', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text('email').notNull(),
+  codeHash: text('code_hash').notNull(),
+  purpose: text('purpose', { enum: ['registration', 'claiming'] }).notNull(),
+  attempts: integer('attempts').default(0),
+  used: boolean('used').default(false),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
 })

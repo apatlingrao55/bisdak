@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
+import { createAndSendOTP } from '@/lib/otp'
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData()
@@ -36,5 +37,9 @@ export async function POST(request: NextRequest) {
     passwordHash,
   })
 
-  return Response.redirect(new URL('/auth/sign-in?registered=1', request.url))
+  await createAndSendOTP(email, 'registration')
+
+  return Response.redirect(
+    new URL(`/auth/verify?email=${encodeURIComponent(email)}`, request.url)
+  )
 }

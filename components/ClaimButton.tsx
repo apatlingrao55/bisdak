@@ -2,15 +2,41 @@
 
 import { useState } from 'react'
 
-export default function ClaimButton({ businessId }: { businessId: string }) {
-  const [state, setState] = useState<'idle' | 'loading' | 'pending' | 'approved' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
+type ClaimState = 'idle' | 'sending-otp' | 'otp-sent' | 'verifying' | 'pending' | 'approved' | 'error'
 
-  async function handleClaim() {
-    setState('loading')
+export default function ClaimButton({ businessId }: { businessId: string }) {
+  const [state, setState] = useState<ClaimState>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [otpCode, setOtpCode] = useState('')
+  const [message, setMessage] = useState('')
+
+  async function handleSendOTP() {
+    setState('sending-otp')
+    setErrorMsg('')
+    try {
+      const res = await fetch('/api/claims/verify', { method: 'POST' })
+      const data = await res.json()
+      if (data.error) {
+        setErrorMsg(data.error)
+        setState('error')
+      } else {
+        setState('otp-sent')
+      }
+    } catch {
+      setErrorMsg('Network error. Please try again.')
+      setState('error')
+    }
+  }
+
+  async function handleClaim(e: React.FormEvent) {
+    e.preventDefault()
+    setState('verifying')
+    setErrorMsg('')
     try {
       const form = new FormData()
       form.set('businessId', businessId)
+      form.set('otpCode', otpCode)
+      if (message) form.set('message', message)
 
       const res = await fetch('/api/claims', { method: 'POST', body: form, redirect: 'manual' })
 
@@ -28,7 +54,7 @@ export default function ClaimButton({ businessId }: { businessId: string }) {
       } else {
         const data = await res.json().catch(() => ({ error: 'Something went wrong' }))
         setErrorMsg(data.error)
-        setState('error')
+        setState('otp-sent') // Stay on OTP form so they can retry
       }
     } catch {
       setErrorMsg('Network error. Please try again.')
@@ -60,15 +86,58 @@ export default function ClaimButton({ businessId }: { businessId: string }) {
     )
   }
 
+  if (state === 'otp-sent' || state === 'verifying') {
+    return (
+      <form onSubmit={handleClaim} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <p style={{ color: '#A1A1AA', fontSize: '14px', margin: 0 }}>
+          A verification code was sent to your email. Enter it below to confirm your claim.
+        </p>
+        {errorMsg && (
+          <span style={{ color: '#F87171', fontSize: '13px' }}>{errorMsg}</span>
+        )}
+        <input
+          type="text"
+          inputMode="numeric"
+          maxLength={6}
+          required
+          autoFocus
+          autoComplete="one-time-code"
+          placeholder="000000"
+          value={otpCode}
+          onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          className="input-dark"
+          style={{ fontSize: '20px', letterSpacing: '6px', textAlign: 'center', maxWidth: '200px' }}
+        />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            type="submit"
+            disabled={state === 'verifying' || otpCode.length !== 6}
+            className="btn-primary"
+            style={{ fontSize: '14px', padding: '8px 16px', opacity: state === 'verifying' ? 0.6 : 1 }}
+          >
+            {state === 'verifying' ? 'Verifying...' : 'Confirm Claim'}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setState('idle'); setOtpCode(''); setErrorMsg('') }}
+            style={{ background: 'none', border: 'none', color: '#71717A', fontSize: '13px', cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    )
+  }
+
   return (
     <>
       <button
-        onClick={handleClaim}
-        disabled={state === 'loading'}
+        onClick={handleSendOTP}
+        disabled={state === 'sending-otp'}
         className="btn-primary"
-        style={{ fontSize: '15px', padding: '10px 20px', opacity: state === 'loading' ? 0.6 : 1 }}
+        style={{ fontSize: '15px', padding: '10px 20px', opacity: state === 'sending-otp' ? 0.6 : 1 }}
       >
-        {state === 'loading' ? 'Claiming...' : 'Claim this business'}
+        {state === 'sending-otp' ? 'Sending code...' : 'Claim this business'}
       </button>
       {state === 'error' && (
         <span style={{ color: '#F87171', fontSize: '13px' }}>{errorMsg}</span>

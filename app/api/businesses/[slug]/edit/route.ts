@@ -37,6 +37,11 @@ export async function POST(
     return new Response('Unauthorized', { status: 401 })
   }
 
+  // Non-admin users must have verified email
+  if (!admin && !session?.user?.emailVerified) {
+    return new Response('Email not verified', { status: 403 })
+  }
+
   const { slug } = await params
 
   // Load business

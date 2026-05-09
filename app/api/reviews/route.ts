@@ -2,8 +2,17 @@ import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { reviews, businesses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { auth } from '@/auth'
 
 export async function POST(request: NextRequest) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return new Response('Sign in to leave a review', { status: 401 })
+  }
+  if (!session.user.emailVerified) {
+    return new Response('Verify your email to leave a review', { status: 403 })
+  }
+
   const formData = await request.formData()
   const businessId = formData.get('businessId') as string
   const reviewerName = formData.get('reviewerName') as string

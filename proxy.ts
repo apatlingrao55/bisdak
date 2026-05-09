@@ -9,6 +9,16 @@ export default auth((req) => {
   if (isDashboard && !isLoggedIn && !isAdmin) {
     return NextResponse.redirect(new URL('/auth/sign-in', req.url))
   }
+
+  // Redirect unverified users to /auth/verify
+  if (isDashboard && isLoggedIn && !isAdmin && !req.auth?.user?.emailVerified) {
+    const email = req.auth?.user?.email
+    if (email) {
+      return NextResponse.redirect(
+        new URL(`/auth/verify?email=${encodeURIComponent(email)}`, req.url)
+      )
+    }
+  }
 })
 
 export const config = {

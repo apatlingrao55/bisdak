@@ -1,21 +1,36 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
-import { businesses, businessClaims, users } from '@/lib/db/schema'
-import { eq, and, isNull } from 'drizzle-orm'
+import { businesses, businessClaims, users, emailVerifications } from '@/lib/db/schema'
+import { eq, and, isNull, gt, sql } from 'drizzle-orm'
 import { auth } from '@/auth'
+import { verifyOTP } from '@/lib/otp'
 
 export async function POST(request: NextRequest) {
   const session = await auth()
   if (!session?.user?.id) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  if (!session.user.emailVerified) {
+    return Response.json({ error: 'Email not verified' }, { status: 403 })
+  }
 
   const formData = await request.formData()
   const businessId = (formData.get('businessId') as string)?.trim()
   const message = (formData.get('message') as string)?.trim().slice(0, 500) || null
+  const otpCode = (formData.get('otpCode') as string)?.trim()
 
   if (!businessId) {
     return Response.json({ error: 'businessId is required' }, { status: 400 })
+  }
+
+  // Verify claiming OTP
+  if (!otpCode) {
+    return Response.json({ error: 'OTP code is required for claiming' }, { status: 400 })
+  }
+
+  const otpResult = await verifyOTP(session.user.email!, otpCode, 'claiming')
+  if (otpResult.error) {
+    return Response.json({ error: otpResult.error }, { status: 400 })
   }
 
   const [biz] = await db
