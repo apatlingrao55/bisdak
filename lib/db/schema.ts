@@ -81,6 +81,15 @@ export const posts = pgTable('posts', {
   createdAt: timestamp('created_at').defaultNow(),
 })
 
+export const businessClaims = pgTable('business_claims', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id').notNull().references(() => users.id),
+  businessId: text('business_id').notNull().references(() => businesses.id),
+  status: text('status', { enum: ['pending', 'approved', 'rejected'] }).default('pending'),
+  message: text('message'),
+  createdAt: timestamp('created_at').defaultNow(),
+})
+
 // NextAuth v5 tables
 export const accounts = pgTable('accounts', {
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
