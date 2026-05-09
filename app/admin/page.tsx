@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import ApproveAllButton from './ApproveAllButton'
 import { db } from '@/lib/db'
-import { submissions, reviews, posts } from '@/lib/db/schema'
+import { submissions, reviews, posts, businessClaims, businesses, users } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 
 type SearchParams = Promise<{ error?: string }>
@@ -62,6 +62,22 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     .from(reviews)
     .where(eq(reviews.isFlagged, true))
     .orderBy(reviews.createdAt)
+
+  const pendingClaims = await db
+    .select({
+      id: businessClaims.id,
+      message: businessClaims.message,
+      createdAt: businessClaims.createdAt,
+      businessName: businesses.name,
+      businessSlug: businesses.slug,
+      userName: users.name,
+      userEmail: users.email,
+    })
+    .from(businessClaims)
+    .innerJoin(businesses, eq(businessClaims.businessId, businesses.id))
+    .innerJoin(users, eq(businessClaims.userId, users.id))
+    .where(eq(businessClaims.status, 'pending'))
+    .orderBy(businessClaims.createdAt)
 
   const allPosts = await db
     .select()
@@ -141,6 +157,68 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
                             }}
                           >
                             ✕ Reject
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Pending Claims */}
+          <section style={{ marginBottom: '64px' }}>
+            <h2 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 400, margin: '0 0 24px' }}>
+              Pending Claims ({pendingClaims.length})
+            </h2>
+            {pendingClaims.length === 0 ? (
+              <p style={{ color: '#52525B', fontSize: '15px' }}>No pending claims.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {pendingClaims.map(claim => (
+                  <div
+                    key={claim.id}
+                    style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '20px 24px' }}
+                    className="shadow-card"
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h3 style={{ color: '#ffffff', margin: '0 0 6px', fontSize: '18px', fontWeight: 600 }}>
+                          {claim.businessName}
+                        </h3>
+                        <p style={{ color: '#71717A', margin: '0 0 4px', fontSize: '13px' }}>
+                          Claimed by: {claim.userName ?? 'Unknown'} ({claim.userEmail})
+                        </p>
+                        {claim.message && (
+                          <p style={{ color: '#A1A1AA', margin: '4px 0 0', fontSize: '14px', lineHeight: 1.5 }}>
+                            &ldquo;{claim.message}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                        <form action={`/api/admin/claims/${claim.id}`} method="POST">
+                          <input type="hidden" name="status" value="approved" />
+                          <button type="submit" className="btn-primary" style={{ padding: '8px 16px', fontSize: '14px' }}>
+                            Approve
+                          </button>
+                        </form>
+                        <form action={`/api/admin/claims/${claim.id}`} method="POST">
+                          <input type="hidden" name="status" value="rejected" />
+                          <button
+                            type="submit"
+                            style={{
+                              background: 'transparent',
+                              color: '#71717A',
+                              border: '1px solid #3F3F46',
+                              borderRadius: '9999px',
+                              padding: '8px 16px',
+                              fontSize: '14px',
+                              cursor: 'pointer',
+                              transition: 'all 200ms ease',
+                            }}
+                          >
+                            Reject
                           </button>
                         </form>
                       </div>

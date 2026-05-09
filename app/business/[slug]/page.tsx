@@ -3,11 +3,13 @@ export const dynamic = 'force-dynamic'
 import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
 import ShareButton from '@/components/ShareButton'
+import ClaimButton from '@/components/ClaimButton'
 import { db } from '@/lib/db'
-import { reviews } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { reviews, businessClaims } from '@/lib/db/schema'
+import { eq, and } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { getBusinessBySlug } from '@/lib/db/queries'
+import { auth } from '@/auth'
 
 const BASE = 'https://bisdak.co.nz'
 
@@ -41,6 +43,28 @@ export default async function BusinessPage({ params }: { params: Params }) {
   const biz = await getBusinessBySlug(slug)
 
   if (!biz) notFound()
+
+  const session = await auth()
+  const userId = session?.user?.id
+
+  // Check if user can claim this business
+  let canClaim = false
+  let hasPendingClaim = false
+  if (userId && !biz.ownerId) {
+    const [existing] = await db
+      .select({ id: businessClaims.id, status: businessClaims.status })
+      .from(businessClaims)
+      .where(and(
+        eq(businessClaims.userId, userId),
+        eq(businessClaims.businessId, biz.id),
+      ))
+      .limit(1)
+    if (existing) {
+      hasPendingClaim = existing.status === 'pending'
+    } else {
+      canClaim = true
+    }
+  }
 
   const bizReviews = await db
     .select()
@@ -142,6 +166,19 @@ export default async function BusinessPage({ params }: { params: Params }) {
                 </a>
               )}
               <ShareButton slug={biz.slug} name={biz.name} />
+              {canClaim && <ClaimButton businessId={biz.id} />}
+              {hasPendingClaim && (
+                <span style={{
+                  background: 'rgba(54,244,164,0.08)',
+                  color: '#36F4A4',
+                  borderRadius: '9999px',
+                  padding: '10px 20px',
+                  fontSize: '15px',
+                  fontWeight: 500,
+                }}>
+                  Claim pending review
+                </span>
+              )}
             </div>
           </div>
         </section>

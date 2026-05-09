@@ -3,8 +3,8 @@ export const dynamic = 'force-dynamic'
 import Nav from '@/components/Nav'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { businesses, reviews, categories, regions } from '@/lib/db/schema'
-import { eq, inArray } from 'drizzle-orm'
+import { businesses, reviews, categories, regions, businessClaims } from '@/lib/db/schema'
+import { eq, inArray, and } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
@@ -26,6 +26,17 @@ export default async function DashboardPage() {
     .leftJoin(categories, eq(businesses.categoryId, categories.id))
     .leftJoin(regions, eq(businesses.regionId, regions.id))
     .where(eq(businesses.ownerId, userId))
+
+  // Pending claims for this user
+  const pendingClaims = await db
+    .select({
+      id: businessClaims.id,
+      businessName: businesses.name,
+      status: businessClaims.status,
+    })
+    .from(businessClaims)
+    .innerJoin(businesses, eq(businessClaims.businessId, businesses.id))
+    .where(and(eq(businessClaims.userId, userId), eq(businessClaims.status, 'pending')))
 
   const bizIds = myBusinesses.map(b => b.id)
 
@@ -51,6 +62,30 @@ export default async function DashboardPage() {
               Welcome back, {session.user.name ?? session.user.email}
             </p>
           </div>
+
+          {/* Pending Claims */}
+          {pendingClaims.length > 0 && (
+            <section style={{ marginBottom: '40px' }}>
+              <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 400, margin: '0 0 16px' }}>Pending Claims</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {pendingClaims.map(claim => (
+                  <div
+                    key={claim.id}
+                    style={{
+                      background: 'rgba(54,244,164,0.05)',
+                      border: '1px solid rgba(54,244,164,0.2)',
+                      borderRadius: '10px',
+                      padding: '14px 20px',
+                      color: '#A1A1AA',
+                      fontSize: '15px',
+                    }}
+                  >
+                    Your claim for <span style={{ color: '#ffffff', fontWeight: 600 }}>{claim.businessName}</span> is pending admin review.
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Listings */}
           <section style={{ marginBottom: '56px' }}>
@@ -101,9 +136,14 @@ export default async function DashboardPage() {
                         </span>
                       </p>
                     </div>
-                    <a href={`/business/${b.slug}`} className="btn-ghost" style={{ padding: '8px 16px', fontSize: '14px' }}>
-                      View Listing
-                    </a>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <a href={`/dashboard/edit/${b.slug}`} className="btn-primary" style={{ padding: '8px 16px', fontSize: '14px' }}>
+                        Edit
+                      </a>
+                      <a href={`/business/${b.slug}`} className="btn-ghost" style={{ padding: '8px 16px', fontSize: '14px' }}>
+                        View
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>
