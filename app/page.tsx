@@ -28,7 +28,7 @@ export default async function HomePage() {
       <HeroCarousel />
 
       {/* Categories */}
-      <section style={{ background: '#061A1C', padding: 'clamp(48px, 8vw, 80px) 24px' }}>
+      <section style={{ background: '#061A1C', padding: 'clamp(48px, 8vw, 80px) clamp(32px, 6vw, 64px)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <h2 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 330, margin: '0 0 12px', textAlign: 'center' }}>
             Browse by Category
@@ -41,7 +41,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Listings */}
-      <section style={{ background: '#000000', padding: 'clamp(48px, 8vw, 80px) 24px' }}>
+      <section style={{ background: '#000000', padding: 'clamp(48px, 8vw, 80px) clamp(32px, 6vw, 64px)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <h2 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 330, margin: '0 0 12px' }}>
             Recently Added
@@ -66,7 +66,7 @@ export default async function HomePage() {
 
       {/* News teaser */}
       {latestPosts.length > 0 && (
-        <section style={{ background: '#061A1C', padding: 'clamp(48px, 8vw, 80px) 24px', borderTop: '1px solid #1E2C31' }}>
+        <section style={{ background: '#061A1C', padding: 'clamp(48px, 8vw, 80px) clamp(32px, 6vw, 64px)', borderTop: '1px solid #1E2C31' }}>
           <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '48px', flexWrap: 'wrap', gap: '16px' }}>
               <div>
@@ -120,7 +120,7 @@ export default async function HomePage() {
       {/* CTA strip */}
       <section style={{
         background: '#102620',
-        padding: 'clamp(40px, 6vw, 56px) 24px',
+        padding: 'clamp(40px, 6vw, 56px) clamp(32px, 6vw, 64px)',
         textAlign: 'center',
         borderTop: '1px solid #1E2C31',
       }}>
@@ -135,7 +135,7 @@ export default async function HomePage() {
         </a>
       </section>
 
-      <footer style={{ background: '#000000', padding: '28px 24px', textAlign: 'center', borderTop: '1px solid #1E2C31' }}>
+      <footer style={{ background: '#000000', padding: '28px clamp(32px, 6vw, 64px)', textAlign: 'center', borderTop: '1px solid #1E2C31' }}>
         <p style={{ color: '#52525B', fontSize: '14px', margin: 0 }}>
           © 2026 BisDak Pinoy Business Hub · bisdak.co.nz ·{' '}
           <a href="/submit" style={{ color: '#71717A', textDecoration: 'none' }}>Submit a Business</a>
