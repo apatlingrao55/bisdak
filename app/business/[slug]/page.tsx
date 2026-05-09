@@ -10,6 +10,8 @@ import { eq, and } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { getBusinessBySlug } from '@/lib/db/queries'
 import { auth } from '@/auth'
+import { getCategoryColor } from '@/lib/category-color'
+import { extractMapsQuery } from '@/lib/maps'
 
 const BASE = 'https://bisdak.co.nz'
 
@@ -96,100 +98,164 @@ export default async function BusinessPage({ params }: { params: Params }) {
     ...(biz.photoUrl ? { image: biz.photoUrl } : {}),
   }
 
+  const mapsQuery = biz.googleMapsUrl ? extractMapsQuery(biz.googleMapsUrl) : null
+  const mapsEmbedQuery = mapsQuery ?? (biz.name + (biz.regionName ? `, ${biz.regionName}, New Zealand` : ', New Zealand'))
+
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Nav />
-      <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000000' }}>
 
-        {/* Business hero */}
-        <section style={{ background: '#061A1C', padding: '48px 24px', borderBottom: '1px solid #1E2C31' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  {biz.categoryName && (
-                    <span style={{ background: 'rgba(255,255,255,0.08)', color: '#ffffff', borderRadius: '9999px', padding: '4px 12px', fontSize: '13px' }}>
-                      {biz.categoryName}
-                    </span>
-                  )}
-                  {biz.regionName && (
-                    <span style={{ color: '#A1A1AA', fontSize: '13px' }}>📍 {biz.regionName}</span>
-                  )}
-                  {biz.isPremium && (
-                    <span style={{ background: 'rgba(251,191,36,0.12)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.25)', borderRadius: '9999px', padding: '4px 12px', fontSize: '13px', fontWeight: 600 }}>
-                      ★ Featured Business
-                    </span>
-                  )}
-                  {biz.isFilipino && (
-                    <span style={{ background: 'rgba(54,244,164,0.12)', color: '#36F4A4', border: '1px solid rgba(54,244,164,0.25)', borderRadius: '9999px', padding: '4px 12px', fontSize: '13px', fontWeight: 600 }}>
-                      🇵🇭 Filipino-owned
-                    </span>
-                  )}
-                </div>
-                <h1 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 330, margin: '0 0 16px', lineHeight: 1.1 }}>
-                  {biz.name}
-                </h1>
-                {biz.description && (
-                  <p style={{ color: '#A1A1AA', fontSize: '18px', lineHeight: 1.6, margin: 0, maxWidth: '640px' }}>
-                    {biz.description}
-                  </p>
-                )}
-              </div>
-              {biz.openStatus && (
-                <span style={{ color: biz.openStatus === 'open' ? '#36F4A4' : '#71717A', fontWeight: 600, fontSize: '15px', flexShrink: 0 }}>
-                  ● {biz.openStatus === 'open' ? 'Open now' : 'Closed'}
-                </span>
-              )}
+      {/* ── Section 1: Hero Banner ── */}
+      <section style={{
+        position: 'relative',
+        width: '100%',
+        height: 'clamp(300px, 50vw, 440px)',
+        overflow: 'hidden',
+        background: biz.photoUrl ? '#1E2C31' : getCategoryColor(biz.categoryName),
+        marginTop: '64px',
+      }}>
+        {biz.photoUrl ? (
+          <img
+            src={biz.photoUrl}
+            alt={biz.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : (
+          <div style={{
+            width: '100%', height: '100%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 'clamp(80px, 15vw, 140px)', opacity: 0.3,
+          }}>
+            {biz.categoryIcon ?? '🏢'}
+          </div>
+        )}
+        {/* Gradient overlay */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          height: '70%',
+          background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
+          pointerEvents: 'none',
+        }} />
+        {/* Overlaid content */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          padding: 'clamp(24px, 4vw, 48px) clamp(24px, 5vw, 64px)',
+        }}>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {biz.categoryName && (
+              <span style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', color: '#ffffff', borderRadius: '9999px', padding: '4px 14px', fontSize: '13px' }}>
+                {biz.categoryName}
+              </span>
+            )}
+            {biz.regionName && (
+              <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px' }}>📍 {biz.regionName}</span>
+            )}
+            {biz.isPremium && (
+              <span style={{ background: 'rgba(251,191,36,0.2)', backdropFilter: 'blur(4px)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.3)', borderRadius: '9999px', padding: '4px 14px', fontSize: '13px', fontWeight: 600 }}>
+                ★ Featured
+              </span>
+            )}
+            {biz.isFilipino && (
+              <span style={{ background: 'rgba(54,244,164,0.15)', backdropFilter: 'blur(4px)', color: '#36F4A4', border: '1px solid rgba(54,244,164,0.25)', borderRadius: '9999px', padding: '4px 14px', fontSize: '13px', fontWeight: 600 }}>
+                🇵🇭 Filipino-owned
+              </span>
+            )}
+            {biz.openStatus && (
+              <span style={{ color: biz.openStatus === 'open' ? '#36F4A4' : '#71717A', fontWeight: 600, fontSize: '14px' }}>
+                ● {biz.openStatus === 'open' ? 'Open now' : 'Closed'}
+              </span>
+            )}
+          </div>
+          <h1 style={{ color: '#ffffff', fontSize: 'clamp(32px, 6vw, 64px)', fontWeight: 300, margin: 0, lineHeight: 1.1, textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
+            {biz.name}
+          </h1>
+          {bizReviews.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+              <StarRating rating={Math.round(avgRating)} />
+              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px' }}>
+                {avgRating.toFixed(1)} ({bizReviews.length} review{bizReviews.length !== 1 ? 's' : ''})
+              </span>
             </div>
+          )}
+        </div>
+      </section>
 
-            {/* Contact links */}
-            <div style={{ display: 'flex', gap: '12px', marginTop: '32px', flexWrap: 'wrap' }}>
-              {biz.phone && (
-                <a href={`tel:${biz.phone}`} className="btn-primary" style={{ fontSize: '15px', padding: '10px 20px' }}>
-                  📞 {biz.phone}
-                </a>
-              )}
-              {biz.website && (
-                <a href={biz.website} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '15px', padding: '10px 20px' }}>
-                  🌐 Website
-                </a>
-              )}
-              {biz.email && (
-                <a href={`mailto:${biz.email}`} className="btn-ghost" style={{ fontSize: '15px', padding: '10px 20px' }}>
-                  ✉️ {biz.email}
-                </a>
-              )}
-              {biz.facebookUrl && (
-                <a href={biz.facebookUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '15px', padding: '10px 20px' }}>
-                  📘 Facebook
-                </a>
-              )}
-              {biz.googleMapsUrl && (
-                <a href={biz.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '15px', padding: '10px 20px' }}>
-                  📍 Google Maps
-                </a>
-              )}
-              <ShareButton slug={biz.slug} name={biz.name} />
-              {canClaim && <ClaimButton businessId={biz.id} />}
-              {hasPendingClaim && (
-                <span style={{
-                  background: 'rgba(54,244,164,0.08)',
-                  color: '#36F4A4',
-                  borderRadius: '9999px',
-                  padding: '10px 20px',
-                  fontSize: '15px',
-                  fontWeight: 500,
-                }}>
-                  Claim pending review
-                </span>
-              )}
-            </div>
+      {/* ── Section 2: About ── */}
+      {biz.description && (
+        <section style={{ background: '#02090A', padding: 'clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
+          <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center' }}>
+            <p style={{ color: '#D4D4D8', fontSize: 'clamp(18px, 2.5vw, 22px)', lineHeight: 1.8, margin: 0 }}>
+              {biz.description}
+            </p>
           </div>
         </section>
+      )}
 
-        {/* Reviews section */}
-        <section style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 24px' }}>
+      {/* ── Section 3: Contact Strip ── */}
+      <section style={{ background: '#061A1C', padding: 'clamp(28px, 4vw, 48px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '900px', margin: '0 auto' }}>
+          {biz.phone && (
+            <a href={`tel:${biz.phone}`} className="btn-primary" style={{ fontSize: '16px', padding: '14px 28px' }}>
+              📞 {biz.phone}
+            </a>
+          )}
+          {biz.website && (
+            <a href={biz.website} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '16px', padding: '14px 28px' }}>
+              🌐 Website
+            </a>
+          )}
+          {biz.email && (
+            <a href={`mailto:${biz.email}`} className="btn-ghost" style={{ fontSize: '16px', padding: '14px 28px' }}>
+              ✉️ Email
+            </a>
+          )}
+          {biz.facebookUrl && (
+            <a href={biz.facebookUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '16px', padding: '14px 28px' }}>
+              📘 Facebook
+            </a>
+          )}
+          {biz.googleMapsUrl && (
+            <a href={biz.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '16px', padding: '14px 28px' }}>
+              📍 Get Directions
+            </a>
+          )}
+          <ShareButton slug={biz.slug} name={biz.name} />
+          {canClaim && <ClaimButton businessId={biz.id} />}
+          {hasPendingClaim && (
+            <span style={{
+              background: 'rgba(54,244,164,0.08)',
+              color: '#36F4A4',
+              borderRadius: '9999px',
+              padding: '14px 28px',
+              fontSize: '16px',
+              fontWeight: 500,
+            }}>
+              Claim pending review
+            </span>
+          )}
+        </div>
+      </section>
+
+      {/* ── Section 4: Embedded Map ── */}
+      {biz.googleMapsUrl && (
+        <section style={{ width: '100%', height: 'clamp(280px, 40vw, 400px)', borderBottom: '1px solid #1E2C31' }}>
+          <iframe
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(mapsEmbedQuery)}&output=embed`}
+            width="100%"
+            height="100%"
+            style={{ border: 0, display: 'block' }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title={`Map showing ${biz.name}`}
+          />
+        </section>
+      )}
+
+      {/* ── Section 5: Reviews ── */}
+      <section style={{ background: '#000000', padding: 'clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px', flexWrap: 'wrap' }}>
             <h2 style={{ color: '#ffffff', fontSize: '28px', fontWeight: 400, margin: 0 }}>Reviews</h2>
             {bizReviews.length > 0 && (
@@ -302,8 +368,8 @@ export default async function BusinessPage({ params }: { params: Params }) {
               ))}
             </div>
           )}
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
   )
 }
