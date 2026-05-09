@@ -5,8 +5,9 @@ import HeroCarousel from '@/components/HeroCarousel'
 import CategoryGrid from '@/components/CategoryGrid'
 import BusinessCard from '@/components/BusinessCard'
 import { db } from '@/lib/db'
-import { businesses, categories, regions, reviews, posts } from '@/lib/db/schema'
-import { eq, desc, sql } from 'drizzle-orm'
+import { categories, posts } from '@/lib/db/schema'
+import { eq, desc } from 'drizzle-orm'
+import { getBusinessCards } from '@/lib/db/queries'
 import Link from 'next/link'
 
 export default async function HomePage() {
@@ -19,27 +20,7 @@ export default async function HomePage() {
     .orderBy(desc(posts.publishedAt))
     .limit(3)
 
-  const featured = await db
-    .select({
-      id: businesses.id,
-      name: businesses.name,
-      slug: businesses.slug,
-      description: businesses.description,
-      isFilipino: businesses.isFilipino,
-      openStatus: businesses.openStatus,
-      categoryName: categories.name,
-      regionName: regions.name,
-      avgRating: sql<number>`COALESCE(AVG(${reviews.rating}), 0)`,
-      reviewCount: sql<number>`COUNT(${reviews.id})`,
-    })
-    .from(businesses)
-    .leftJoin(categories, eq(businesses.categoryId, categories.id))
-    .leftJoin(regions, eq(businesses.regionId, regions.id))
-    .leftJoin(reviews, eq(reviews.businessId, businesses.id))
-    .where(eq(businesses.status, 'active'))
-    .groupBy(businesses.id, categories.name, regions.name)
-    .orderBy(desc(businesses.createdAt))
-    .limit(6)
+  const featured = await getBusinessCards({ limit: 6 })
 
   return (
     <main>

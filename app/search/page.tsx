@@ -4,9 +4,10 @@ import Nav from '@/components/Nav'
 import BusinessCard from '@/components/BusinessCard'
 import SearchBar from '@/components/SearchBar'
 import { db } from '@/lib/db'
-import { businesses, categories, regions, reviews } from '@/lib/db/schema'
-import { eq, like, and, desc, asc, sql, or } from 'drizzle-orm'
+import { businesses, categories, regions } from '@/lib/db/schema'
+import { eq, like, or } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
+import { getBusinessCards } from '@/lib/db/queries'
 
 type SearchParams = Promise<{
   q?: string
@@ -25,7 +26,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
   const allCategories = await db.select().from(categories)
   const allRegions = await db.select().from(regions)
 
-  const conditions: SQL[] = [eq(businesses.status, 'active') as SQL]
+  const conditions: SQL[] = []
 
   if (q.trim()) {
     const searchCond = or(
@@ -45,28 +46,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
     if (reg) conditions.push(eq(businesses.regionId, reg.id) as SQL)
   }
 
-  const orderBy = sort === 'alpha' ? asc(businesses.name) : desc(businesses.createdAt)
-
-  const results = await db
-    .select({
-      id: businesses.id,
-      name: businesses.name,
-      slug: businesses.slug,
-      description: businesses.description,
-      isFilipino: businesses.isFilipino,
-      openStatus: businesses.openStatus,
-      categoryName: categories.name,
-      regionName: regions.name,
-      avgRating: sql<number>`COALESCE(AVG(${reviews.rating}), 0)`,
-      reviewCount: sql<number>`COUNT(${reviews.id})`,
-    })
-    .from(businesses)
-    .leftJoin(categories, eq(businesses.categoryId, categories.id))
-    .leftJoin(regions, eq(businesses.regionId, regions.id))
-    .leftJoin(reviews, eq(reviews.businessId, businesses.id))
-    .where(and(...conditions))
-    .groupBy(businesses.id, categories.name, regions.name)
-    .orderBy(orderBy)
+  const results = await getBusinessCards({
+    conditions,
+    orderBy: sort === 'alpha' ? 'alpha' : 'newest',
+  })
 
   return (
     <main>

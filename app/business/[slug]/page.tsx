@@ -2,44 +2,20 @@ export const dynamic = 'force-dynamic'
 
 import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
+import ShareButton from '@/components/ShareButton'
 import { db } from '@/lib/db'
-import { businesses, categories, regions, reviews } from '@/lib/db/schema'
-import { eq, avg, count } from 'drizzle-orm'
+import { reviews } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
+import { getBusinessBySlug } from '@/lib/db/queries'
 
 const BASE = 'https://bisdak.co.nz'
 
 type Params = Promise<{ slug: string }>
 
-async function getBiz(slug: string) {
-  const [biz] = await db
-    .select({
-      id: businesses.id,
-      name: businesses.name,
-      slug: businesses.slug,
-      description: businesses.description,
-      phone: businesses.phone,
-      email: businesses.email,
-      website: businesses.website,
-      facebookUrl: businesses.facebookUrl,
-      googleMapsUrl: businesses.googleMapsUrl,
-      isFilipino: businesses.isFilipino,
-      photoUrl: businesses.photoUrl,
-      openStatus: businesses.openStatus,
-      categoryName: categories.name,
-      regionName: regions.name,
-    })
-    .from(businesses)
-    .leftJoin(categories, eq(businesses.categoryId, categories.id))
-    .leftJoin(regions, eq(businesses.regionId, regions.id))
-    .where(eq(businesses.slug, slug))
-    .limit(1)
-  return biz ?? null
-}
-
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params
-  const biz = await getBiz(slug)
+  const biz = await getBusinessBySlug(slug)
   if (!biz) return {}
   const title = `${biz.name} — ${biz.categoryName ?? 'Filipino Business'} in ${biz.regionName ?? 'New Zealand'}`
   const description = biz.description
@@ -54,15 +30,15 @@ export async function generateMetadata({ params }: { params: Params }) {
       description,
       url: `${BASE}/business/${slug}`,
       type: 'website',
-      ...(biz.photoUrl ? { images: [{ url: biz.photoUrl, alt: biz.name }] } : {}),
+      images: [{ url: `${BASE}/api/og/${slug}`, width: 1200, height: 630, alt: biz.name }],
     },
-    twitter: { card: 'summary', title, description },
+    twitter: { card: 'summary_large_image', title, description },
   }
 }
 
 export default async function BusinessPage({ params }: { params: Params }) {
   const { slug } = await params
-  const biz = await getBiz(slug)
+  const biz = await getBusinessBySlug(slug)
 
   if (!biz) notFound()
 
@@ -165,6 +141,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                   📍 Google Maps
                 </a>
               )}
+              <ShareButton slug={biz.slug} name={biz.name} />
             </div>
           </div>
         </section>
