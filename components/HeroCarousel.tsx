@@ -1,4 +1,5 @@
 'use client'
+import { useRef } from 'react'
 import InstallButton from './InstallButton'
 
 const HERO_VIDEO = 'https://yjotmehqsvojjoamwxak.supabase.co/storage/v1/object/public/photos/videos/jeepney.mp4'
@@ -9,6 +10,7 @@ export default function HeroCarousel() {
 
       {/* Video background */}
       <video
+        ref={(el) => { if (el) el.playbackRate = 0.5 }}
         autoPlay
         muted
         loop
