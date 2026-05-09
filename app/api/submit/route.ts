@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { submissions } from '@/lib/db/schema'
+import { notifyAdmin } from '@/lib/notify'
 
 function slugify(text: string): string {
   return text
@@ -35,6 +36,14 @@ export async function POST(request: NextRequest) {
     submitterEmail,
     status: 'pending',
   })
+
+  notifyAdmin(
+    'New Business Submission',
+    `<p><strong>${name}</strong> was submitted for review.</p>
+     <p>${[phone, website, submitterEmail].filter(Boolean).join(' · ')}</p>
+     ${description ? `<p>${description}</p>` : ''}
+     <p><a href="https://bisdak.co.nz/admin">Review in admin panel</a></p>`
+  )
 
   return Response.redirect(new URL('/submit?success=1', request.url))
 }

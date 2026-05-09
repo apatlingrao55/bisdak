@@ -4,6 +4,7 @@ import { businesses, businessClaims, users, emailVerifications } from '@/lib/db/
 import { eq, and, isNull, gt, sql } from 'drizzle-orm'
 import { auth } from '@/auth'
 import { verifyOTP } from '@/lib/otp'
+import { notifyAdmin } from '@/lib/notify'
 
 export async function POST(request: NextRequest) {
   const session = await auth()
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 
   const [biz] = await db
-    .select({ id: businesses.id, email: businesses.email, ownerId: businesses.ownerId })
+    .select({ id: businesses.id, name: businesses.name, email: businesses.email, ownerId: businesses.ownerId })
     .from(businesses)
     .where(eq(businesses.id, businessId))
     .limit(1)
@@ -108,6 +109,13 @@ export async function POST(request: NextRequest) {
     status: 'pending',
     message,
   })
+
+  notifyAdmin(
+    'New Business Claim',
+    `<p><strong>${session.user.email}</strong> wants to claim <strong>${biz.name}</strong>.</p>
+     ${message ? `<p>Message: "${message}"</p>` : ''}
+     <p><a href="https://bisdak.co.nz/admin">Review in admin panel</a></p>`
+  )
 
   const referer = request.headers.get('referer')
   if (referer) {
