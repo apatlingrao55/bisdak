@@ -16,6 +16,7 @@ type Business = {
   avgRating: number
   reviewCount: number
   openStatus: string | null
+  isPremium: boolean | null
   photoUrl: string | null
   phone: string | null
   email: string | null
@@ -77,6 +78,21 @@ export default function BusinessCard({ business }: { business: Business }) {
           <h3 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
             {business.name}
           </h3>
+          {business.isPremium && (
+            <span style={{
+              background: 'rgba(251,191,36,0.12)',
+              color: '#FBBF24',
+              border: '1px solid rgba(251,191,36,0.25)',
+              borderRadius: '9999px',
+              padding: '2px 10px',
+              fontSize: '11px',
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}>
+              ★ Featured
+            </span>
+          )}
           {business.isFilipino && (
             <span style={{
               background: 'rgba(54,244,164,0.12)',

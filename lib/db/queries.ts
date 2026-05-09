@@ -21,6 +21,7 @@ export const getBusinessBySlug = cache(async function getBusinessBySlug(slug: st
       photoUrl: businesses.photoUrl,
       openStatus: businesses.openStatus,
       ownerId: businesses.ownerId,
+      isPremium: businesses.isPremium,
       categoryName: categories.name,
       categorySlug: categories.slug,
       categoryIcon: categories.icon,
@@ -58,6 +59,7 @@ export async function getBusinessCards(options?: {
       phone: businesses.phone,
       email: businesses.email,
       website: businesses.website,
+      isPremium: businesses.isPremium,
       categoryName: categories.name,
       categoryIcon: categories.icon,
       regionName: regions.name,
@@ -70,7 +72,7 @@ export async function getBusinessCards(options?: {
     .leftJoin(reviews, eq(reviews.businessId, businesses.id))
     .where(and(...allConditions))
     .groupBy(businesses.id, categories.name, categories.icon, regions.name)
-    .orderBy(order)
+    .orderBy(desc(businesses.isPremium), order)
     .$dynamic()
 
   if (limit) {

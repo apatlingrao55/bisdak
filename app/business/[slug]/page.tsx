@@ -116,6 +116,11 @@ export default async function BusinessPage({ params }: { params: Params }) {
                   {biz.regionName && (
                     <span style={{ color: '#A1A1AA', fontSize: '13px' }}>📍 {biz.regionName}</span>
                   )}
+                  {biz.isPremium && (
+                    <span style={{ background: 'rgba(251,191,36,0.12)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.25)', borderRadius: '9999px', padding: '4px 12px', fontSize: '13px', fontWeight: 600 }}>
+                      ★ Featured Business
+                    </span>
+                  )}
                   {biz.isFilipino && (
                     <span style={{ background: 'rgba(54,244,164,0.12)', color: '#36F4A4', border: '1px solid rgba(54,244,164,0.25)', borderRadius: '9999px', padding: '4px 12px', fontSize: '13px', fontWeight: 600 }}>
                       🇵🇭 Filipino-owned

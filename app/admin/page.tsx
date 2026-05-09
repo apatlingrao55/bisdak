@@ -82,6 +82,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       categoryName: categories.name,
       regionName: regions.name,
       ownerId: businesses.ownerId,
+      isPremium: businesses.isPremium,
     })
     .from(businesses)
     .leftJoin(categories, eq(businesses.categoryId, categories.id))

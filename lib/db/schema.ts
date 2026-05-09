@@ -39,6 +39,7 @@ export const businesses = pgTable('businesses', {
   status: text('status', { enum: ['pending', 'active', 'rejected'] }).default('active'),
   photoUrl: text('photo_url'),
   openStatus: text('open_status', { enum: ['open', 'closed'] }),
+  isPremium: boolean('is_premium').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 })
 

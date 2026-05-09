@@ -10,6 +10,7 @@ type Business = {
   categoryName: string | null
   regionName: string | null
   ownerId: string | null
+  isPremium: boolean | null
 }
 
 export default function BusinessFilter({ businesses }: { businesses: Business[] }) {
@@ -51,6 +52,11 @@ export default function BusinessFilter({ businesses }: { businesses: Business[] 
                 <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: biz.status === 'active' ? 'rgba(54,244,164,0.1)' : 'rgba(113,113,122,0.2)', color: biz.status === 'active' ? '#36F4A4' : '#71717A' }}>
                   {biz.status}
                 </span>
+                {biz.isPremium && (
+                  <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: 'rgba(251,191,36,0.1)', color: '#FBBF24' }}>
+                    ★ premium
+                  </span>
+                )}
                 {biz.ownerId && (
                   <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: 'rgba(96,165,250,0.1)', color: '#60A5FA' }}>
                     claimed
@@ -58,7 +64,29 @@ export default function BusinessFilter({ businesses }: { businesses: Business[] 
                 )}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', gap: '8px', flexShrink: 0, flexWrap: 'wrap' }}>
+              <button
+                onClick={async () => {
+                  const res = await fetch(`/api/admin/businesses/${biz.id}/premium`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isPremium: !biz.isPremium }),
+                  })
+                  if (res.ok) window.location.reload()
+                  else alert('Failed to toggle premium')
+                }}
+                style={{
+                  background: biz.isPremium ? 'rgba(251,191,36,0.15)' : 'transparent',
+                  color: biz.isPremium ? '#FBBF24' : '#71717A',
+                  border: `1px solid ${biz.isPremium ? 'rgba(251,191,36,0.3)' : '#3F3F46'}`,
+                  borderRadius: '9999px',
+                  padding: '8px 12px',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                {biz.isPremium ? '★ Premium' : '☆ Set Premium'}
+              </button>
               <a href={`/dashboard/edit/${biz.slug}`} className="btn-primary" style={{ padding: '8px 16px', fontSize: '14px', textDecoration: 'none' }}>
                 Edit
               </a>
