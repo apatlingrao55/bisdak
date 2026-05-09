@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
@@ -7,21 +8,29 @@ import { businesses, categories, regions } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 
+async function isAdmin(): Promise<boolean> {
+  const cookieStore = await cookies()
+  const session = cookieStore.get('admin_session')?.value ?? ''
+  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
+  return !!adminToken && session === adminToken
+}
+
 type Params = Promise<{ slug: string }>
 
 export default async function EditBusinessPage({ params }: { params: Params }) {
+  const admin = await isAdmin()
   const session = await auth()
-  if (!session?.user?.id) redirect('/auth/sign-in')
+
+  if (!admin && !session?.user?.id) redirect('/auth/sign-in')
 
   const { slug } = await params
 
-  const [biz] = await db
-    .select()
-    .from(businesses)
-    .where(and(eq(businesses.slug, slug), eq(businesses.ownerId, session.user.id)))
-    .limit(1)
+  // Admin can edit any business; owner can only edit their own
+  const [biz] = admin
+    ? await db.select().from(businesses).where(eq(businesses.slug, slug)).limit(1)
+    : await db.select().from(businesses).where(and(eq(businesses.slug, slug), eq(businesses.ownerId, session!.user!.id))).limit(1)
 
-  if (!biz) redirect('/dashboard')
+  if (!biz) redirect(admin ? '/admin' : '/dashboard')
 
   const allCategories = await db.select().from(categories)
   const allRegions = await db.select().from(regions)
@@ -123,7 +132,7 @@ export default async function EditBusinessPage({ params }: { params: Params }) {
               <button type="submit" className="btn-primary" style={{ height: '52px', fontSize: '16px', flex: 1 }}>
                 Save Changes
               </button>
-              <a href="/dashboard" className="btn-ghost" style={{ height: '52px', fontSize: '16px', display: 'flex', alignItems: 'center', padding: '0 24px' }}>
+              <a href={admin ? '/admin' : '/dashboard'} className="btn-ghost" style={{ height: '52px', fontSize: '16px', display: 'flex', alignItems: 'center', padding: '0 24px' }}>
                 Cancel
               </a>
             </div>

@@ -1,8 +1,16 @@
 import { NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
 import { db } from '@/lib/db'
 import { businesses } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { auth } from '@/auth'
+
+async function isAdmin(): Promise<boolean> {
+  const cookieStore = await cookies()
+  const session = cookieStore.get('admin_session')?.value ?? ''
+  const adminToken = (process.env.ADMIN_TOKEN ?? '').trim()
+  return !!adminToken && session === adminToken
+}
 
 function isValidUrl(str: string): boolean {
   try {
@@ -21,14 +29,16 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const admin = await isAdmin()
   const session = await auth()
-  if (!session?.user?.id) {
+
+  if (!admin && !session?.user?.id) {
     return new Response('Unauthorized', { status: 401 })
   }
 
   const { slug } = await params
 
-  // Load business and verify ownership
+  // Load business
   const [biz] = await db
     .select({ id: businesses.id, ownerId: businesses.ownerId })
     .from(businesses)
@@ -39,7 +49,8 @@ export async function POST(
     return new Response('Not found', { status: 404 })
   }
 
-  if (biz.ownerId !== session.user.id) {
+  // Super admin can edit any business; owners can only edit their own
+  if (!admin && biz.ownerId !== session?.user?.id) {
     return new Response('Forbidden', { status: 403 })
   }
 
@@ -78,12 +89,19 @@ export async function POST(
     return new Response('Photo URL must be a valid HTTPS URL', { status: 400 })
   }
 
-  // Defense-in-depth: ownership check in WHERE clause
-  await db
-    .update(businesses)
-    .set({ name, description, phone, email, website, facebookUrl, googleMapsUrl, photoUrl, openStatus })
-    .where(and(eq(businesses.id, biz.id), eq(businesses.ownerId, session.user.id)))
+  // Admin updates by id only; owner updates with ownership check
+  if (admin) {
+    await db
+      .update(businesses)
+      .set({ name, description, phone, email, website, facebookUrl, googleMapsUrl, photoUrl, openStatus })
+      .where(eq(businesses.id, biz.id))
+  } else {
+    await db
+      .update(businesses)
+      .set({ name, description, phone, email, website, facebookUrl, googleMapsUrl, photoUrl, openStatus })
+      .where(and(eq(businesses.id, biz.id), eq(businesses.ownerId, session!.user!.id)))
+  }
 
-  const referer = request.headers.get('referer') ?? '/dashboard'
-  return Response.redirect(new URL('/dashboard', request.url), 302)
+  const redirectTo = admin ? `/admin` : `/dashboard`
+  return Response.redirect(new URL(redirectTo, request.url), 302)
 }
