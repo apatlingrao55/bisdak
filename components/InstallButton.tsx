@@ -85,25 +85,121 @@ export default function InstallButton() {
       </button>
 
       {showIOSToast && (
-        <div style={{
-          position: 'fixed',
-          bottom: 24,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#1c1c1e',
-          color: '#fff',
-          padding: '16px 24px',
-          borderRadius: 14,
-          fontSize: 15,
-          lineHeight: 1.5,
-          zIndex: 9999,
-          maxWidth: 340,
-          textAlign: 'center',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-          border: '1px solid #333',
-        }}>
-          Tap <strong style={{ fontSize: 18 }}>⎋</strong> (Share) then <strong>"Add to Home Screen"</strong>
-        </div>
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => setShowIOSToast(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.6)',
+              zIndex: 9998,
+            }}
+          />
+          {/* Guide card */}
+          <div style={{
+            position: 'fixed',
+            bottom: 24,
+            left: 16,
+            right: 16,
+            maxWidth: 380,
+            margin: '0 auto',
+            background: '#1c1c1e',
+            color: '#fff',
+            padding: '28px 24px 20px',
+            borderRadius: 20,
+            zIndex: 9999,
+            boxShadow: '0 12px 48px rgba(0,0,0,0.7)',
+            border: '1px solid #333',
+          }}>
+            {/* Close */}
+            <button
+              onClick={() => setShowIOSToast(false)}
+              style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', color: '#71717a', fontSize: 20, cursor: 'pointer' }}
+            >
+              &times;
+            </button>
+
+            <p style={{ fontSize: 16, fontWeight: 600, margin: '0 0 20px', textAlign: 'center' }}>
+              Install BisDak
+            </p>
+
+            {/* Steps */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              {/* Step 1 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#2c2c2e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3v12M12 3l-4 4M12 3l4 4" stroke="#007AFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <rect x="3" y="14" width="18" height="7" rx="2" stroke="#007AFF" strokeWidth="2" fill="none"/>
+                  </svg>
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 500 }}>
+                    Tap the <span style={{ color: '#007AFF' }}>Share</span> button
+                  </p>
+                  <p style={{ margin: '2px 0 0', fontSize: 13, color: '#8e8e93' }}>
+                    At the bottom of Safari
+                  </p>
+                </div>
+              </div>
+
+              {/* Arrow */}
+              <div style={{ textAlign: 'center', color: '#48484a', fontSize: 18, lineHeight: 1 }}>&#8595;</div>
+
+              {/* Step 2 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#2c2c2e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="4" stroke="#007AFF" strokeWidth="2" fill="none"/>
+                    <path d="M12 8v8M8 12h8" stroke="#007AFF" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 500 }}>
+                    Tap <span style={{ color: '#007AFF' }}>"Add to Home Screen"</span>
+                  </p>
+                  <p style={{ margin: '2px 0 0', fontSize: 13, color: '#8e8e93' }}>
+                    Scroll down if you don't see it
+                  </p>
+                </div>
+              </div>
+
+              {/* Arrow */}
+              <div style={{ textAlign: 'center', color: '#48484a', fontSize: 18, lineHeight: 1 }}>&#8595;</div>
+
+              {/* Step 3 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#2c2c2e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17l-5-5" stroke="#34C759" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 500 }}>
+                    Tap <span style={{ color: '#34C759' }}>"Add"</span>
+                  </p>
+                  <p style={{ margin: '2px 0 0', fontSize: 13, color: '#8e8e93' }}>
+                    BisDak appears on your home screen
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom pointer triangle */}
+            <div style={{
+              position: 'absolute',
+              bottom: -10,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '10px solid transparent',
+              borderRight: '10px solid transparent',
+              borderTop: '10px solid #1c1c1e',
+            }} />
+          </div>
+        </>
       )}
     </>
   )
