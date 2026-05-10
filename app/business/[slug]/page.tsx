@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import Link from 'next/link'
 import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
 import ShareButton from '@/components/ShareButton'
@@ -9,6 +10,7 @@ import { reviews, businessClaims } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { getBusinessBySlug } from '@/lib/db/queries'
+import { listActiveJobsForBusiness } from '@/lib/jobs/queries'
 import { auth } from '@/auth'
 import { getCategoryColor } from '@/lib/category-color'
 import { extractMapsQuery } from '@/lib/maps'
@@ -73,6 +75,8 @@ export default async function BusinessPage({ params }: { params: Params }) {
     .from(reviews)
     .where(eq(reviews.businessId, biz.id))
     .orderBy(reviews.createdAt)
+
+  const businessJobs = await listActiveJobsForBusiness(biz.id)
 
   const avgRating = bizReviews.length > 0
     ? bizReviews.reduce((sum, r) => sum + r.rating, 0) / bizReviews.length
@@ -263,7 +267,46 @@ export default async function BusinessPage({ params }: { params: Params }) {
         </section>
       )}
 
-      {/* ── Section 5: Reviews ── */}
+      {/* ── Section 5: Jobs at this business ── */}
+      {businessJobs.length > 0 && (
+        <section style={{ background: '#02090A', padding: 'clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <h2 style={{ color: '#fff', fontSize: 22, fontWeight: 400, margin: '0 0 16px' }}>
+              Jobs at {biz.name}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {businessJobs.map(j => (
+                <Link
+                  key={j.id}
+                  href={`/jobs/${j.id}`}
+                  style={{
+                    background: '#0A0A0A',
+                    border: '1px solid #1F1F22',
+                    borderRadius: 10,
+                    padding: '14px 18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    textDecoration: 'none',
+                  }}
+                >
+                  <div>
+                    <div style={{ color: '#fff', fontSize: 15 }}>{j.title}</div>
+                    <div style={{ color: '#A1A1AA', fontSize: 13, marginTop: 2 }}>
+                      {new Date(j.postedAt).toLocaleDateString('en-NZ')}
+                      {j.salary ? ` · ${j.salary}` : ''}
+                    </div>
+                  </div>
+                  <span style={{ color: '#36F4A4', fontSize: 14 }}>View →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Section 6: Reviews ── */}
       <section style={{ background: '#000000', padding: 'clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px', flexWrap: 'wrap' }}>
