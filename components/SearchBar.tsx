@@ -8,6 +8,7 @@ export default function SearchBar({ defaultValue = '' }: { defaultValue?: string
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    window.dispatchEvent(new Event('bisdak:nav-start'))
     router.push(`/search?q=${encodeURIComponent(query.trim())}`)
   }
 

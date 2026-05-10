@@ -42,6 +42,7 @@ export default function Nav() {
     try {
       hasInternal = sessionStorage.getItem(INTERNAL_NAV_KEY) === '1'
     } catch {}
+    window.dispatchEvent(new Event('bisdak:nav-start'))
     if (hasInternal) router.back()
     else router.push('/')
   }

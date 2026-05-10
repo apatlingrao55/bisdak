@@ -47,6 +47,27 @@ body {
   min-height: 100vh;
 }
 
+/* Tap feedback — universal press dim, suppress iOS default blue tap highlight */
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  a,
+  [role="button"] {
+    transition: opacity 100ms ease;
+  }
+}
+
+button:active:not(:disabled),
+a:active,
+[role="button"]:active:not([aria-disabled="true"]) {
+  opacity: 0.7;
+}
+
 /* Card shadow system */
 .shadow-card {
   box-shadow:

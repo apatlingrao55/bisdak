@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/Providers'
+import RouteProgress from '@/components/RouteProgress'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -51,6 +53,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body className="min-h-screen antialiased">
+        <Suspense fallback={null}>
+          <RouteProgress />
+        </Suspense>
         <Providers>{children}</Providers>
         <script
           dangerouslySetInnerHTML={{
