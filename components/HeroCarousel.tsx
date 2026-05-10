@@ -1,5 +1,6 @@
 'use client'
 import { useRef } from 'react'
+import Link from 'next/link'
 import InstallButton from './InstallButton'
 
 const HERO_VIDEO = 'https://yjotmehqsvojjoamwxak.supabase.co/storage/v1/object/public/photos/videos/jeepney2.mp4'
@@ -69,12 +70,12 @@ export default function HeroCarousel() {
           The definitive directory of Filipino-owned businesses across New Zealand. From adobo to accounting — find your kababayan.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          <a href="/search" className="btn-primary" style={{ fontSize: 16, padding: '13px 28px' }}>
+          <Link href="/search" className="btn-primary" style={{ fontSize: 16, padding: '13px 28px' }}>
             Browse All Businesses →
-          </a>
-          <a href="/submit" className="btn-ghost" style={{ fontSize: 16, padding: '13px 28px' }}>
+          </Link>
+          <Link href="/submit" className="btn-ghost" style={{ fontSize: 16, padding: '13px 28px' }}>
             Submit a Business
-          </a>
+          </Link>
           <InstallButton />
         </div>
       </div>
