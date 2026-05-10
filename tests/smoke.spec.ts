@@ -237,3 +237,32 @@ test('robots.txt is accessible', async ({ request }) => {
   const res = await request.get('/robots.txt')
   expect(res.status()).toBe(200)
 })
+
+test('/jobs index loads', async ({ page }) => {
+  const errors = collectConsoleErrors(page)
+  await page.goto('/jobs')
+  await expect(page.getByRole('heading', { name: 'Jobs' })).toBeVisible()
+  // Filter form is present
+  await expect(page.locator('input[name="q"]')).toBeVisible()
+  await expect(page.locator('select[name="region"]')).toBeVisible()
+  await expect(page.locator('select[name="type"]')).toBeVisible()
+  expect(errors).toHaveLength(0)
+})
+
+test('/jobs filter by type does not crash', async ({ page }) => {
+  const errors = collectConsoleErrors(page)
+  await page.goto('/jobs?type=full_time')
+  await expect(page.locator('main')).toBeVisible()
+  expect(errors).toHaveLength(0)
+})
+
+test('/jobs/<missing-id> shows 404', async ({ page }) => {
+  await page.goto('/jobs/this-id-does-not-exist-xyz')
+  // Next.js 404 page
+  await expect(page.locator('body')).toContainText(/not found|404/i)
+})
+
+test('/dashboard/jobs without auth redirects to sign-in', async ({ page }) => {
+  await page.goto('/dashboard/jobs')
+  await expect(page).toHaveURL(/\/auth\/sign-in/)
+})
