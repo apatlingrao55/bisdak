@@ -13,8 +13,8 @@ type Params = Promise<{ id: string }>
 
 export default async function EditJobPage({ params }: { params: Params }) {
   const session = await auth()
-  if (!session?.user?.id) redirect('/auth/sign-in')
   const { id } = await params
+  if (!session?.user?.id) redirect(`/auth/sign-in?callbackUrl=/dashboard/jobs/${id}/edit`)
 
   const job = await getJobIfOwner(session.user.id, id)
   if (!job) redirect('/dashboard/jobs')

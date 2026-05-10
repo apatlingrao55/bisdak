@@ -1,7 +1,11 @@
 import Nav from '@/components/Nav'
 import { signInAction } from './actions'
 
-export default function SignInPage() {
+type SearchParams = Promise<{ callbackUrl?: string; next?: string }>
+
+export default async function SignInPage({ searchParams }: { searchParams: SearchParams }) {
+  const sp = await searchParams
+  const callbackUrl = sp.callbackUrl ?? sp.next ?? ''
   return (
     <main>
       <Nav />
@@ -25,6 +29,7 @@ export default function SignInPage() {
             </p>
 
             <form action={signInAction} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <input type="hidden" name="callbackUrl" value={callbackUrl} />
               <div>
                 <label style={{ color: '#A1A1AA', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Email</label>
                 <input

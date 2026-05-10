@@ -9,7 +9,7 @@ import { listJobsForOwner } from '@/lib/jobs/queries'
 
 export default async function DashboardJobsPage() {
   const session = await auth()
-  if (!session?.user?.id) redirect('/auth/sign-in?next=/dashboard/jobs')
+  if (!session?.user?.id) redirect('/auth/sign-in?callbackUrl=/dashboard/jobs')
 
   const myJobs = await listJobsForOwner(session.user.id)
 

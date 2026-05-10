@@ -41,8 +41,8 @@ export default function ApplyButton({ jobId, applyUrl, applyEmail, isSignedIn }:
     }
     if (!isSignedIn) {
       e.preventDefault()
-      const next = encodeURIComponent(`/jobs/${jobId}?apply=1`)
-      window.location.href = `/auth/sign-in?next=${next}`
+      const callbackUrl = encodeURIComponent(`/jobs/${jobId}?apply=1`)
+      window.location.href = `/auth/sign-in?callbackUrl=${callbackUrl}`
       return
     }
     e.preventDefault()

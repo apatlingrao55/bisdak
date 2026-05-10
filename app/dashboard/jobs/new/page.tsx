@@ -10,7 +10,7 @@ import { and, eq } from 'drizzle-orm'
 
 export default async function NewJobPage() {
   const session = await auth()
-  if (!session?.user?.id) redirect('/auth/sign-in?next=/dashboard/jobs/new')
+  if (!session?.user?.id) redirect('/auth/sign-in?callbackUrl=/dashboard/jobs/new')
 
   const myBusinesses = await db
     .select({ id: businesses.id, name: businesses.name })
