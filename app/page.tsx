@@ -1,4 +1,4 @@
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 import Nav from '@/components/Nav'
 import HeroCarousel from '@/components/HeroCarousel'
@@ -20,7 +20,7 @@ export default async function HomePage() {
     .orderBy(desc(posts.publishedAt))
     .limit(3)
 
-  const featured = await getBusinessCards({ limit: 6 })
+  const featured = await getBusinessCards({ limit: 6, orderBy: 'featured' })
 
   return (
     <main>
@@ -44,10 +44,10 @@ export default async function HomePage() {
       <section style={{ background: '#000000', padding: 'clamp(48px, 8vw, 80px) clamp(32px, 6vw, 64px)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <h2 style={{ color: '#ffffff', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 330, margin: '0 0 12px' }}>
-            Recently Added
+            Featured Businesses
           </h2>
           <p style={{ color: '#A1A1AA', margin: '0 0 48px', fontSize: '18px' }}>
-            The latest Pinoy businesses listed on BisDak
+            Pinoy businesses to discover today
           </p>
           <div style={{
             display: 'grid',

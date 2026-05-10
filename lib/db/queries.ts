@@ -40,13 +40,11 @@ export const getBusinessBySlug = cache(async function getBusinessBySlug(slug: st
 export async function getBusinessCards(options?: {
   limit?: number
   conditions?: SQL[]
-  orderBy?: 'newest' | 'alpha'
+  orderBy?: 'newest' | 'alpha' | 'featured'
 }) {
   const { limit, conditions = [], orderBy = 'newest' } = options ?? {}
 
   const allConditions: SQL[] = [eq(businesses.status, 'active') as SQL, ...conditions]
-
-  const order = orderBy === 'alpha' ? asc(businesses.name) : desc(businesses.createdAt)
 
   let query = db
     .select({
@@ -73,8 +71,21 @@ export async function getBusinessCards(options?: {
     .leftJoin(reviews, eq(reviews.businessId, businesses.id))
     .where(and(...allConditions))
     .groupBy(businesses.id, categories.name, categories.icon, regions.name)
-    .orderBy(desc(businesses.isPremium), order)
     .$dynamic()
+
+  if (orderBy === 'featured') {
+    query = query.orderBy(
+      sql`CASE
+            WHEN ${businesses.isPremium} THEN 0
+            WHEN ${businesses.photoUrl} IS NOT NULL AND ${businesses.photoUrl} <> '' THEN 1
+            ELSE 2
+          END`,
+      sql`RANDOM()`,
+    )
+  } else {
+    const order = orderBy === 'alpha' ? asc(businesses.name) : desc(businesses.createdAt)
+    query = query.orderBy(desc(businesses.isPremium), order)
+  }
 
   if (limit) {
     query = query.limit(limit)
