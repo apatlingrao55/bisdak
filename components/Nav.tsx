@@ -101,6 +101,9 @@ export default function Nav() {
         <Link href="/search" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
           Browse
         </Link>
+        <Link href="/tools" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
+          Tools
+        </Link>
         <Link href="/blog" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
           News
         </Link>
@@ -155,6 +158,9 @@ export default function Nav() {
         }} className="nav-mobile-overlay">
           <Link href="/search" onClick={() => setMenuOpen(false)} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '24px', fontWeight: 300 }}>
             Browse
+          </Link>
+          <Link href="/tools" onClick={() => setMenuOpen(false)} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '24px', fontWeight: 300 }}>
+            Tools
           </Link>
           <Link href="/blog" onClick={() => setMenuOpen(false)} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '24px', fontWeight: 300 }}>
             News
