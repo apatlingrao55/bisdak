@@ -21,7 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
   const q = params.q ?? ''
   const categorySlug = params.category ?? ''
   const regionSlug = params.region ?? ''
-  const sort = params.sort ?? 'newest'
+  const sort = params.sort ?? 'featured'
 
   const allCategories = await db.select().from(categories)
   const allRegions = await db.select().from(regions)
@@ -48,7 +48,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
 
   const results = await getBusinessCards({
     conditions,
-    orderBy: sort === 'alpha' ? 'alpha' : 'newest',
+    orderBy: sort === 'alpha' ? 'alpha' : sort === 'newest' ? 'newest' : 'featured',
   })
 
   return (
@@ -105,6 +105,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
                   Sort by
                 </h3>
                 <select name="sort" defaultValue={sort} className="input-dark" style={{ fontSize: '14px' }}>
+                  <option value="featured">Featured</option>
                   <option value="newest">Newest first</option>
                   <option value="alpha">A – Z</option>
                 </select>
