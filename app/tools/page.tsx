@@ -38,6 +38,12 @@ const TOOLS = [
     title: 'Manila ↔ NZ time zone',
     desc: 'See what time it is in the Philippines and New Zealand right now.',
   },
+  {
+    slug: 'timer',
+    icon: '⏱',
+    title: 'Timer & countdown',
+    desc: 'Stopwatch and countdown timer for cooking, Pomodoro, exercise, or prayer.',
+  },
 ] as const
 
 export default function ToolsPage() {

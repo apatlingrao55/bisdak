@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/tools/gst`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/tools/currency`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/tools/time-zone`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${BASE}/tools/timer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
   ]
 
   const businessRoutes: MetadataRoute.Sitemap = allBusinesses.map(b => ({
