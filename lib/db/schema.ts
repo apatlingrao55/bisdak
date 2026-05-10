@@ -93,6 +93,21 @@ export const businessClaims = pgTable('business_claims', {
   createdAt: timestamp('created_at').defaultNow(),
 })
 
+export const jobs = pgTable('jobs', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  businessId: text('business_id').notNull().references(() => businesses.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  employmentType: text('employment_type', { enum: ['full_time', 'part_time', 'casual', 'contract'] }).notNull(),
+  applyUrl: text('apply_url'),
+  applyEmail: text('apply_email'),
+  salary: text('salary'),
+  status: text('status', { enum: ['open', 'closed'] }).default('open').notNull(),
+  postedAt: timestamp('posted_at').defaultNow().notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  closedAt: timestamp('closed_at'),
+})
+
 // NextAuth v5 tables
 export const accounts = pgTable('accounts', {
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),

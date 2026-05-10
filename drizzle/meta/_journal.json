@@ -8,6 +8,13 @@
       "when": 1778303412570,
       "tag": "0000_clever_the_executioner",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778455852524,
+      "tag": "0001_brief_logan",
+      "breakpoints": true
     }
   ]
 }
