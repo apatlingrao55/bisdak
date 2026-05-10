@@ -1,11 +1,13 @@
 export const dynamic = 'force-dynamic'
 
 import Nav from '@/components/Nav'
+import Link from 'next/link'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { businesses, reviews, categories, regions, businessClaims } from '@/lib/db/schema'
 import { eq, inArray, and } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
+import { listJobsForOwner } from '@/lib/jobs/queries'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -37,6 +39,11 @@ export default async function DashboardPage() {
     .from(businessClaims)
     .innerJoin(businesses, eq(businessClaims.businessId, businesses.id))
     .where(and(eq(businessClaims.userId, userId), eq(businessClaims.status, 'pending')))
+
+  const myJobs = await listJobsForOwner(userId)
+  const openJobsCount = myJobs.filter(
+    j => j.status === 'open' && !j.closedAt && new Date(j.expiresAt) > new Date(),
+  ).length
 
   const bizIds = myBusinesses.map(b => b.id)
 
@@ -86,6 +93,29 @@ export default async function DashboardPage() {
               </div>
             </section>
           )}
+
+          {/* Jobs */}
+          <section style={{ marginBottom: '40px' }}>
+            <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 400, margin: '0 0 16px' }}>Jobs</h2>
+            <Link
+              href="/dashboard/jobs"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(54,244,164,0.05)',
+                border: '1px solid rgba(54,244,164,0.2)',
+                borderRadius: '10px',
+                padding: '14px 20px',
+                color: '#ffffff',
+                fontSize: '15px',
+                textDecoration: 'none',
+              }}
+            >
+              <span>Manage your job listings</span>
+              <span style={{ color: '#36F4A4' }}>{openJobsCount} open →</span>
+            </Link>
+          </section>
 
           {/* Listings */}
           <section style={{ marginBottom: '56px' }}>
