@@ -1,7 +1,10 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
+
+const INTERNAL_NAV_KEY = 'bisdak:internalNav'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -9,11 +12,39 @@ export default function Nav() {
   const { data: session, status } = useSession()
   const isLoggedIn = status === 'authenticated'
 
+  const router = useRouter()
+  const pathname = usePathname()
+  const isHome = pathname === '/'
+  const prevPathnameRef = useRef<string | null>(null)
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    if (prevPathnameRef.current === null) {
+      prevPathnameRef.current = pathname
+      return
+    }
+    if (prevPathnameRef.current !== pathname) {
+      prevPathnameRef.current = pathname
+      try {
+        sessionStorage.setItem(INTERNAL_NAV_KEY, '1')
+      } catch {}
+    }
+  }, [pathname])
+
+  const handleBack = () => {
+    setMenuOpen(false)
+    let hasInternal = false
+    try {
+      hasInternal = sessionStorage.getItem(INTERNAL_NAV_KEY) === '1'
+    } catch {}
+    if (hasInternal) router.back()
+    else router.push('/')
+  }
 
   return (
     <nav style={{
@@ -31,15 +62,38 @@ export default function Nav() {
       transition: 'background 300ms ease',
       borderBottom: scrolled ? '1px solid #1E2C31' : '1px solid transparent',
     }}>
-      <Link
-        href="/"
-        style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 700, fontSize: '17px', letterSpacing: '-0.2px' }}
-      >
-        🇵🇭 BisDak{' '}
-        <span className="hidden sm:inline" style={{ fontWeight: 400, color: '#A1A1AA' }}>
-          — Pinoy Business Hub NZ
-        </span>
-      </Link>
+      {isHome ? (
+        <Link
+          href="/"
+          style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 700, fontSize: '17px', letterSpacing: '-0.2px' }}
+        >
+          🇵🇭 BisDak{' '}
+          <span className="hidden sm:inline" style={{ fontWeight: 400, color: '#A1A1AA' }}>
+            — Pinoy Business Hub NZ
+          </span>
+        </Link>
+      ) : (
+        <button
+          onClick={handleBack}
+          aria-label="Go back"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#ffffff',
+            fontWeight: 600,
+            fontSize: '15px',
+            letterSpacing: '0.1px',
+            cursor: 'pointer',
+            padding: '4px 0',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span aria-hidden="true" style={{ fontSize: '18px', lineHeight: 1 }}>←</span>
+          Back
+        </button>
+      )}
 
       {/* Desktop nav */}
       <div className="nav-desktop">
