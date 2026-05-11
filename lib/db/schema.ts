@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -82,6 +82,7 @@ export const posts = pgTable('posts', {
   status: text('status', { enum: ['draft', 'published'] }).default('published'),
   publishedAt: timestamp('published_at').defaultNow(),
   createdAt: timestamp('created_at').defaultNow(),
+  meta: jsonb('meta'),
 })
 
 export const businessClaims = pgTable('business_claims', {
