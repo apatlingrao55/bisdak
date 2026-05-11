@@ -90,5 +90,36 @@ export function renderContent(content: string): React.ReactNode[] {
 
   flushList()
 
+  out.push(<LegalDisclaimer key="legal-disclaimer" />)
+
   return out
+}
+
+const LINK_STYLE: React.CSSProperties = { color: '#36F4A4', textDecoration: 'none' }
+
+export function LegalDisclaimer() {
+  return (
+    <aside
+      style={{
+        marginTop: '48px',
+        background: '#0A1416',
+        border: '1px solid #1E2C31',
+        borderRadius: '12px',
+        padding: '20px 24px',
+        fontSize: '14px',
+        lineHeight: 1.6,
+        color: '#71717A',
+      }}
+    >
+      <strong style={{ color: '#A1A1AA' }}>Disclaimer.</strong>{' '}
+      This article is general information only — not legal, immigration,
+      financial, or medical advice. Rules change; verify the current position
+      with the relevant official source (
+      <a href="https://immigration.govt.nz" target="_blank" rel="noopener" style={LINK_STYLE}>immigration.govt.nz</a>,{' '}
+      <a href="https://employment.govt.nz" target="_blank" rel="noopener" style={LINK_STYLE}>employment.govt.nz</a>,{' '}
+      the <a href="https://philembassy.org.nz" target="_blank" rel="noopener" style={LINK_STYLE}>Philippine Embassy in NZ</a>
+      ) and consult a licensed adviser before acting on anything specific to
+      your situation.
+    </aside>
+  )
 }
