@@ -71,24 +71,26 @@ Two files:
 
 ## Cron
 
-Times are UTC. NZT = UTC+12 (summer +13 with daylight saving — accept
-the 1-hour drift twice a year).
+**Check the VPS clock first** with `date` — the entries below are written
+for a VPS on NZ local time (which is how this VPS and the existing
+InspectPro autoblog are configured). If your VPS is on UTC, shift each
+hour value by +12 (NZST) or +13 (NZDT).
 
 ```cron
-# discover daily at 02:00 NZT
-0 14 * * *    /opt/bisdak-autoblog/run.sh discover
+# discover daily at 02:00 NZT (1h before InspectPro autoblog's 03:00 discover)
+0 2 * * *    /opt/bisdak-autoblog/run.sh discover
 
-# publish Mon-Fri at 09:00 NZT
-0 21 * * 1-5  /opt/bisdak-autoblog/run.sh publish
+# publish Mon-Fri at 09:00 NZT (between InspectPro's 06:00 and 14:00 publish)
+0 9 * * 1-5  /opt/bisdak-autoblog/run.sh publish
 
 # weekly keyword refresh at 02:00 NZT Sunday
-0 14 * * 0    /opt/bisdak-autoblog/run.sh keywords
+0 2 * * 0    /opt/bisdak-autoblog/run.sh keywords
 
-# weekly health report at 09:00 NZT Monday
-0 21 * * 1    /opt/bisdak-autoblog/run.sh health
+# weekly health report + dead-mans switch at 09:00 NZT Monday
+0 9 * * 1    /opt/bisdak-autoblog/run.sh health
 
-# weekly draft purge (autoblog drafts > 7d old)
-0 22 * * 0    /opt/bisdak-autoblog/run.sh purge-drafts
+# weekly autoblog-draft purge (>7d old) at 22:00 NZT Sunday
+0 22 * * 0   /opt/bisdak-autoblog/run.sh purge-drafts
 ```
 
 `run.sh` acquires an exclusive `flock` on
