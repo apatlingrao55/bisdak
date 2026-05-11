@@ -23,7 +23,11 @@ from . import db
 
 logger = logging.getLogger(__name__)
 
-CLAUDE_BIN = shutil.which("claude") or "/usr/local/bin/claude"
+CLAUDE_BIN = (
+    shutil.which("claude")
+    or os.path.expanduser("~/.local/bin/claude")
+    or "/usr/local/bin/claude"
+)
 
 NEUTRAL_SYSTEM_PROMPT = (
     "You are a helpful assistant. Follow the user's instructions exactly."

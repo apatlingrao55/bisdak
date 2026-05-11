@@ -20,6 +20,9 @@ fi
 
 export PYTHONPATH="$SCRIPT_DIR"
 export AUTOBLOG_BASE_DIR="$SCRIPT_DIR"
+# Cron starts with a minimal PATH and doesn't load .bashrc; the `claude` CLI
+# lives under the operator's home (the InspectPro autoblog uses the same path).
+export PATH="$HOME/.local/bin:$PATH"
 
 echo "$(date -Iseconds) [INFO] ${COMMAND} started." >> "$LOG_FILE"
 "$PYTHON" -m autoblog.main "$COMMAND" >> "$LOG_FILE" 2>&1
