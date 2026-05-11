@@ -1,4 +1,4 @@
-CREATE TABLE "email_verifications" (
+CREATE TABLE IF NOT EXISTS "email_verifications" (
 	"id" text PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
 	"code_hash" text NOT NULL,
@@ -24,9 +24,9 @@ CREATE TABLE "jobs" (
 	"closed_at" timestamp
 );
 --> statement-breakpoint
-ALTER TABLE "businesses" ADD COLUMN "is_premium" boolean DEFAULT false;--> statement-breakpoint
-ALTER TABLE "businesses" ADD COLUMN "video_url" text;--> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "email_verified" timestamp;--> statement-breakpoint
+ALTER TABLE "businesses" ADD COLUMN IF NOT EXISTS "is_premium" boolean DEFAULT false;--> statement-breakpoint
+ALTER TABLE "businesses" ADD COLUMN IF NOT EXISTS "video_url" text;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "email_verified" timestamp;--> statement-breakpoint
 ALTER TABLE "jobs" ADD CONSTRAINT "jobs_business_id_businesses_id_fk" FOREIGN KEY ("business_id") REFERENCES "public"."businesses"("id") ON DELETE cascade ON UPDATE no action;
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "jobs_status_expires_idx" ON "jobs" ("status", "expires_at");
