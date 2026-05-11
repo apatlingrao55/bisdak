@@ -1,0 +1,18 @@
+[discovery]
+min_delay = 3.0
+max_delay = 7.0
+max_topics_per_run = 20
+min_score = 40
+
+[writer]
+min_words = 1200
+max_words = 1800
+max_revisions = 2
+draft_model = "sonnet"
+review_model = "opus"
+
+[budget]
+max_llm_calls_per_day = 60
+
+[schedule]
+posts_per_week = 5

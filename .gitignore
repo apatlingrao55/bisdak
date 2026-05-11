@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -48,3 +49,14 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+/.playwright-mcp/
+
+# python (autoblog)
+__pycache__/
+*.pyc
+*.pyo
+*.sqlite
+
+# claude / dev scratch
+/.claude/
+/admin-review-page.png
