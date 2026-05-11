@@ -5,6 +5,7 @@ import Nav from '@/components/Nav'
 import StarRating from '@/components/StarRating'
 import ShareButton from '@/components/ShareButton'
 import ClaimButton from '@/components/ClaimButton'
+import RevealContact from '@/components/RevealContact'
 import { db } from '@/lib/db'
 import { reviews, businessClaims } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -88,7 +89,6 @@ export default async function BusinessPage({ params }: { params: Params }) {
     name: biz.name,
     description: biz.description ?? undefined,
     url: biz.website ?? `${BASE}/business/${biz.slug}`,
-    telephone: biz.phone ?? undefined,
     ...(biz.regionName ? { address: { '@type': 'PostalAddress', addressRegion: biz.regionName, addressCountry: 'NZ' } } : {}),
     ...(avgRating > 0 ? {
       aggregateRating: {
@@ -209,19 +209,10 @@ export default async function BusinessPage({ params }: { params: Params }) {
       {/* ── Section 3: Contact Strip ── */}
       <section style={{ background: '#061A1C', padding: 'clamp(28px, 4vw, 48px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '900px', margin: '0 auto' }}>
-          {biz.phone && (
-            <a href={`tel:${biz.phone}`} className="btn-primary" style={{ fontSize: '16px', padding: '14px 28px' }}>
-              📞 {biz.phone}
-            </a>
-          )}
+          {(biz.phone || biz.email) && <RevealContact slug={biz.slug} />}
           {biz.website && (
             <a href={biz.website} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '16px', padding: '14px 28px' }}>
               🌐 Website
-            </a>
-          )}
-          {biz.email && (
-            <a href={`mailto:${biz.email}`} className="btn-ghost" style={{ fontSize: '16px', padding: '14px 28px' }}>
-              ✉️ Email
             </a>
           )}
           {biz.facebookUrl && (
