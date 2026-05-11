@@ -1,0 +1,7 @@
+resend>=2.4.0
+feedparser>=6.0.11
+requests>=2.32.3
+beautifulsoup4>=4.12.3
+lxml>=5.2.2
+psycopg[binary]>=3.2.0
+python-dotenv>=1.0.1
