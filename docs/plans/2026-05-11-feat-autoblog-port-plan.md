@@ -1,7 +1,7 @@
 ---
 title: Port InspectPro's Autoblog to BisDak
 type: feat
-status: active
+status: phase-1-complete
 date: 2026-05-11
 ---
 
