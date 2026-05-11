@@ -145,3 +145,10 @@ export const emailVerifications = pgTable('email_verifications', {
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 })
+
+export const rateLimits = pgTable('rate_limits', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  ip: text('ip').notNull(),
+  route: text('route').notNull(),
+  ts: timestamp('ts').defaultNow().notNull(),
+})
