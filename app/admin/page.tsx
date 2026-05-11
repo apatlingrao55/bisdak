@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Nav from '@/components/Nav'
+import Link from 'next/link'
 import ApproveAllButton from './ApproveAllButton'
 import BusinessFilter from './BusinessFilter'
 import { db } from '@/lib/db'
@@ -8,7 +9,7 @@ import { submissions, reviews, posts, businessClaims, businesses, users, categor
 import { eq, desc } from 'drizzle-orm'
 import { isAdmin } from '@/lib/admin'
 
-type SearchParams = Promise<{ error?: string }>
+type SearchParams = Promise<{ error?: string; posts?: string }>
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams
@@ -89,10 +90,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     .leftJoin(regions, eq(businesses.regionId, regions.id))
     .orderBy(desc(businesses.isPremium), desc(businesses.createdAt))
 
-  const allPosts = await db
-    .select()
-    .from(posts)
-    .orderBy(desc(posts.publishedAt))
+  const postsFilter = params.posts === 'drafts' ? 'drafts' : 'all'
+  const allPosts = await (postsFilter === 'drafts'
+    ? db.select().from(posts).where(eq(posts.status, 'draft')).orderBy(desc(posts.createdAt))
+    : db.select().from(posts).orderBy(desc(posts.publishedAt)))
+  const draftCount = postsFilter === 'drafts'
+    ? allPosts.length
+    : allPosts.filter(p => p.status === 'draft').length
 
   return (
     <main>
@@ -304,26 +308,66 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
               </div>
             </form>
 
+            {/* Filter tabs */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <Link
+                href="/admin"
+                style={{
+                  fontSize: '13px',
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  textDecoration: 'none',
+                  background: postsFilter === 'all' ? 'rgba(54,244,164,0.1)' : 'transparent',
+                  color: postsFilter === 'all' ? '#36F4A4' : '#71717A',
+                  border: postsFilter === 'all' ? '1px solid rgba(54,244,164,0.3)' : '1px solid #1E2C31',
+                }}
+              >
+                All
+              </Link>
+              <Link
+                href="/admin?posts=drafts"
+                style={{
+                  fontSize: '13px',
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  textDecoration: 'none',
+                  background: postsFilter === 'drafts' ? 'rgba(54,244,164,0.1)' : 'transparent',
+                  color: postsFilter === 'drafts' ? '#36F4A4' : '#71717A',
+                  border: postsFilter === 'drafts' ? '1px solid rgba(54,244,164,0.3)' : '1px solid #1E2C31',
+                }}
+              >
+                Drafts{draftCount > 0 ? ` (${draftCount})` : ''}
+              </Link>
+            </div>
+
             {/* Existing posts list */}
             {allPosts.length === 0 ? (
-              <p style={{ color: '#52525B', fontSize: '15px' }}>No posts yet.</p>
+              <p style={{ color: '#52525B', fontSize: '15px' }}>
+                {postsFilter === 'drafts' ? 'No drafts.' : 'No posts yet.'}
+              </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {allPosts.map(post => (
-                  <div key={post.id} style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <div>
-                      <span style={{ display: 'inline-block', marginRight: '10px', fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: post.status === 'published' ? 'rgba(54,244,164,0.1)' : 'rgba(113,113,122,0.2)', color: post.status === 'published' ? '#36F4A4' : '#71717A' }}>
-                        {post.status}
-                      </span>
-                      <span style={{ color: '#ffffff', fontWeight: 500, fontSize: '16px' }}>{post.title}</span>
-                      <span style={{ color: '#52525B', fontSize: '13px', marginLeft: '12px' }}>
-                        {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-NZ') : ''}
+                  <Link
+                    key={post.id}
+                    href={`/admin/posts/${post.id}`}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    <div style={{ background: '#02090A', border: '1px solid #1E2C31', borderRadius: '12px', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', transition: 'border-color 120ms' }}>
+                      <div>
+                        <span style={{ display: 'inline-block', marginRight: '10px', fontSize: '11px', padding: '2px 8px', borderRadius: '9999px', background: post.status === 'published' ? 'rgba(54,244,164,0.1)' : 'rgba(113,113,122,0.2)', color: post.status === 'published' ? '#36F4A4' : '#71717A' }}>
+                          {post.status}
+                        </span>
+                        <span style={{ color: '#ffffff', fontWeight: 500, fontSize: '16px' }}>{post.title}</span>
+                        <span style={{ color: '#52525B', fontSize: '13px', marginLeft: '12px' }}>
+                          {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-NZ') : ''}
+                        </span>
+                      </div>
+                      <span style={{ color: '#71717A', fontSize: '13px' }}>
+                        Review →
                       </span>
                     </div>
-                    <a href={`/blog/${post.slug}`} target="_blank" style={{ color: '#71717A', fontSize: '13px', textDecoration: 'none' }}>
-                      View →
-                    </a>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
