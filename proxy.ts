@@ -5,7 +5,7 @@ import { ipFromRequest } from '@/lib/request'
 import { rateLimit } from '@/lib/rate-limit'
 
 const GOOD_BOT_RE = /(googlebot|bingbot|duckduckbot|slurp|twitterbot|linkedinbot|facebookexternalhit|applebot)/i
-const BAD_TOOL_RE = /^(curl|wget|python-requests|python-urllib|scrapy|httpx|go-http-client|java\/|ruby|node-fetch)/i
+const BAD_TOOL_RE = /^(curl|wget|python-requests|python-urllib|scrapy|httpx|go-http-client|java\/|ruby|node-fetch|axios|okhttp|aiohttp)/i
 
 const ROUTE_LIMITS: Array<{ test: (path: string, method: string) => boolean; key: string; max: number; windowSec: number }> = [
   { test: (p, m) => m === 'POST' && /^\/api\/businesses\/[^/]+\/contact$/.test(p), key: 'contact:min', max: 10, windowSec: 60 },
@@ -37,23 +37,22 @@ export default auth(async (req) => {
   // ── Scraper defense (only for the public/api routes listed above) ────────
   if (SCRAPER_DEFENSE_PATHS.some((t) => t(path, method))) {
     const ua = req.headers.get('user-agent') ?? ''
+    const isGoodBot = GOOD_BOT_RE.test(ua)
 
-    // 1. Verified search engines pass.
-    if (!GOOD_BOT_RE.test(ua)) {
-      // 2. Reject blatant tooling.
+    // Good bots skip the UA blocklist + Accept-* checks (some legit crawlers
+    // omit Accept-Language). They DO still hit the rate limit — UA spoofing
+    // would otherwise bypass the limit entirely.
+    if (!isGoodBot) {
       if (BAD_TOOL_RE.test(ua)) return block('blacklisted-ua', 403)
-
-      // 3. Reject malformed requests (real browsers always send these).
       if (!req.headers.get('accept')) return block('missing-accept', 403)
       if (!req.headers.get('accept-language')) return block('missing-accept-language', 403)
+    }
 
-      // 4. Apply rate limit if route matches.
-      const limit = ROUTE_LIMITS.find((r) => r.test(path, method))
-      if (limit) {
-        const ip = ipFromRequest(req)
-        const result = await rateLimit({ ip, route: limit.key, max: limit.max, windowSec: limit.windowSec })
-        if (!result.ok) return block('rate-limit', 429)
-      }
+    const limit = ROUTE_LIMITS.find((r) => r.test(path, method))
+    if (limit) {
+      const ip = ipFromRequest(req)
+      const result = await rateLimit({ ip, route: limit.key, max: limit.max, windowSec: limit.windowSec })
+      if (!result.ok) return block('rate-limit', 429)
     }
   }
 

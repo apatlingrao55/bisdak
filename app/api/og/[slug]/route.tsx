@@ -102,8 +102,6 @@ export async function GET(_req: Request, { params }: { params: Params }) {
           </div>
 
           <div style={{ display: 'flex', gap: '24px', fontSize: '20px', color: '#71717A', marginTop: '8px' }}>
-            {biz.phone && <span>📞 {biz.phone}</span>}
-            {biz.email && <span>✉️ {truncate(biz.email, 30)}</span>}
             {biz.website && <span>🌐 {getHostname(biz.website)}</span>}
           </div>
         </div>

@@ -18,8 +18,6 @@ type Business = {
   openStatus: string | null
   isPremium: boolean | null
   photoUrl: string | null
-  phone: string | null
-  email: string | null
   website: string | null
 }
 
@@ -144,27 +142,15 @@ export default function BusinessCard({ business }: { business: Business }) {
           </p>
         )}
 
-        {/* Contact details (display-only) */}
-        {(business.phone || business.email || business.website) && (
+        {/* Website only — phone/email are masked behind the detail page's RevealContact */}
+        {business.website && (
           <div style={{
             display: 'flex', gap: '12px', flexWrap: 'wrap',
             marginBottom: '12px', fontSize: '13px', color: '#71717A',
           }}>
-            {business.phone && (
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                📞 {business.phone}
-              </span>
-            )}
-            {business.email && (
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }}>
-                ✉️ {business.email}
-              </span>
-            )}
-            {business.website && (
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px' }}>
-                🌐 {(() => { try { return new URL(business.website).hostname } catch { return business.website } })()}
-              </span>
-            )}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px' }}>
+              🌐 {(() => { try { return new URL(business.website).hostname } catch { return business.website } })()}
+            </span>
           </div>
         )}
 

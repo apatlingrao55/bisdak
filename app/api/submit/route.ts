@@ -3,17 +3,13 @@ import { db } from '@/lib/db'
 import { submissions } from '@/lib/db/schema'
 import { notifyAdmin } from '@/lib/notify'
 import { slugify } from '@/lib/slugify'
-import { rateLimit } from '@/lib/rate-limit'
-import { ipFromRequest } from '@/lib/request'
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export async function POST(request: NextRequest) {
-  const ip = ipFromRequest(request)
-  const rl = await rateLimit({ ip, route: 'submit', max: 5, windowSec: 3600 })
-  if (!rl.ok) return new Response('Rate limited, try again later', { status: 429 })
+  // Rate limit is enforced upstream in proxy.ts (key 'submit').
 
   const formData = await request.formData()
   const name = (formData.get('name') as string)?.trim()

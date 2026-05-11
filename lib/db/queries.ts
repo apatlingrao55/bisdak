@@ -55,8 +55,6 @@ export async function getBusinessCards(options?: {
       isFilipino: businesses.isFilipino,
       openStatus: businesses.openStatus,
       photoUrl: businesses.photoUrl,
-      phone: businesses.phone,
-      email: businesses.email,
       website: businesses.website,
       isPremium: businesses.isPremium,
       categoryName: categories.name,
