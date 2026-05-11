@@ -6,6 +6,7 @@ import { posts } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { renderContent } from '@/lib/blog-renderer'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -14,43 +15,6 @@ export async function generateMetadata({ params }: Props) {
   const [post] = await db.select().from(posts).where(eq(posts.slug, slug)).limit(1)
   if (!post) return {}
   return { title: `${post.title} — BisDak`, description: post.excerpt }
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
-
-function renderContent(content: string) {
-  return content
-    .split('\n')
-    .map((line, i) => {
-      if (line.startsWith('**') && line.endsWith('**')) {
-        return <h3 key={i} style={{ color: '#ffffff', fontSize: '20px', fontWeight: 600, margin: '32px 0 12px' }}>{line.slice(2, -2)}</h3>
-      }
-      if (line.startsWith('---')) {
-        return <hr key={i} style={{ border: 'none', borderTop: '1px solid #1E2C31', margin: '32px 0' }} />
-      }
-      if (line.trim() === '') {
-        return <div key={i} style={{ height: '12px' }} />
-      }
-      // Escape HTML first, then apply safe markdown transformations
-      const escaped = escapeHtml(line)
-      const withLinks = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
-        // Only allow http/https links
-        if (!/^https?:\/\//.test(url)) return text
-        return `<a href="${url}" style="color:#36F4A4;text-decoration:none;">${text}</a>`
-      })
-      const withBold = withLinks.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      const withItalic = withBold.replace(/\*([^*]+)\*/g, '<em>$1</em>')
-      return (
-        <p key={i} style={{ color: '#A1A1AA', fontSize: '18px', lineHeight: 1.7, margin: '0 0 4px' }}
-          dangerouslySetInnerHTML={{ __html: withItalic }} />
-      )
-    })
 }
 
 export default async function BlogPostPage({ params }: Props) {
