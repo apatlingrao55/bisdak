@@ -266,3 +266,34 @@ test('/dashboard/jobs without auth redirects to sign-in', async ({ page }) => {
   await page.goto('/dashboard/jobs')
   await expect(page).toHaveURL(/\/auth\/sign-in/)
 })
+
+test('business detail page does not leak phone/email in HTML', async ({ page }) => {
+  if (!businessSlug) {
+    test.skip(true, 'No active businesses — skipping')
+    return
+  }
+  const errors = collectConsoleErrors(page)
+  await page.goto(businessSlug)
+  // Show contact button visible
+  await expect(page.getByRole('button', { name: /show contact/i }).first()).toBeVisible()
+  // No tel: or mailto: anchors in the rendered HTML
+  expect(await page.locator('a[href^="tel:"]').count()).toBe(0)
+  expect(await page.locator('a[href^="mailto:"]').count()).toBe(0)
+  // No telephone field in JSON-LD
+  const ldText = await page.locator('script[type="application/ld+json"]').first().textContent()
+  expect(ldText ?? '').not.toContain('telephone')
+  expect(errors).toHaveLength(0)
+})
+
+test('clicking show-contact reveals phone or email', async ({ page }) => {
+  if (!businessSlug) {
+    test.skip(true, 'No active businesses — skipping')
+    return
+  }
+  await page.goto(businessSlug)
+  const btn = page.getByRole('button', { name: /show contact/i }).first()
+  await btn.click()
+  // Wait for either tel:/mailto: link OR the "no public contact" message
+  const anyResult = page.locator('a[href^="tel:"], a[href^="mailto:"], text=/no public contact info/i')
+  await expect(anyResult.first()).toBeVisible({ timeout: 5000 })
+})
