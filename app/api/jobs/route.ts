@@ -4,6 +4,8 @@ import { jobs } from '@/lib/db/schema'
 import { auth } from '@/auth'
 import { userOwnsBusiness } from '@/lib/jobs/auth'
 import { parseJobInput } from '@/lib/jobs/validate'
+import { rateLimit } from '@/lib/rate-limit'
+import { ipFromRequest } from '@/lib/request'
 
 const SIXTY_DAYS_MS = 60 * 24 * 60 * 60 * 1000
 
@@ -12,6 +14,10 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return new Response('Sign in required', { status: 401 })
   }
+
+  const ip = ipFromRequest(request)
+  const rl = await rateLimit({ ip, route: 'jobs:create', max: 10, windowSec: 3600 })
+  if (!rl.ok) return new Response('Rate limited, try again later', { status: 429 })
 
   const formData = await request.formData()
   const parsed = parseJobInput(formData)
