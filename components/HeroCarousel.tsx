@@ -78,6 +78,17 @@ export default function HeroCarousel() {
           </Link>
           <InstallButton />
         </div>
+        <p style={{
+          color: 'rgba(255,255,255,0.7)',
+          fontSize: 'clamp(13px, 1.6vw, 15px)',
+          margin: '28px 0 0',
+          maxWidth: 480,
+          lineHeight: 1.55,
+          textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+        }}>
+          <span style={{ color: '#ffffff', fontWeight: 500 }}>Is your business missing?</span>{' '}
+          Submit a listing for free — it takes 2 minutes.
+        </p>
       </div>
     </section>
   )
