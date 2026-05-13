@@ -1,5 +1,8 @@
 import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 
+// RLS is enabled on every table. The app connects as the `postgres` role
+// (BYPASSRLS), so Drizzle queries continue to work; this only blocks
+// Supabase's auto-exposed PostgREST anon/authenticated access.
 export const users = pgTable('users', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull().unique(),
@@ -7,20 +10,20 @@ export const users = pgTable('users', {
   name: text('name'),
   emailVerified: timestamp('email_verified'),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}).enableRLS()
 
 export const categories = pgTable('categories', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   icon: text('icon').notNull(),
-})
+}).enableRLS()
 
 export const regions = pgTable('regions', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
-})
+}).enableRLS()
 
 export const businesses = pgTable('businesses', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -42,7 +45,7 @@ export const businesses = pgTable('businesses', {
   isPremium: boolean('is_premium').default(false),
   videoUrl: text('video_url'),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}).enableRLS()
 
 export const reviews = pgTable('reviews', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -54,7 +57,7 @@ export const reviews = pgTable('reviews', {
   ownerResponse: text('owner_response'),
   isFlagged: boolean('is_flagged').default(false),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}).enableRLS()
 
 export const submissions = pgTable('submissions', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -70,7 +73,7 @@ export const submissions = pgTable('submissions', {
   submitterEmail: text('submitter_email'),
   status: text('status', { enum: ['pending', 'approved', 'rejected'] }).default('pending'),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}).enableRLS()
 
 export const posts = pgTable('posts', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -83,7 +86,7 @@ export const posts = pgTable('posts', {
   publishedAt: timestamp('published_at').defaultNow(),
   createdAt: timestamp('created_at').defaultNow(),
   meta: jsonb('meta'),
-})
+}).enableRLS()
 
 export const businessClaims = pgTable('business_claims', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -92,7 +95,7 @@ export const businessClaims = pgTable('business_claims', {
   status: text('status', { enum: ['pending', 'approved', 'rejected'] }).default('pending'),
   message: text('message'),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}).enableRLS()
 
 export const jobs = pgTable('jobs', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -107,7 +110,7 @@ export const jobs = pgTable('jobs', {
   postedAt: timestamp('posted_at').defaultNow().notNull(),
   expiresAt: timestamp('expires_at').notNull(),
   closedAt: timestamp('closed_at'),
-})
+}).enableRLS()
 
 // NextAuth v5 tables
 export const accounts = pgTable('accounts', {
@@ -122,19 +125,19 @@ export const accounts = pgTable('accounts', {
   scope: text('scope'),
   id_token: text('id_token'),
   session_state: text('session_state'),
-})
+}).enableRLS()
 
 export const sessions = pgTable('sessions', {
   sessionToken: text('sessionToken').primaryKey(),
   userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
   expires: timestamp('expires').notNull(),
-})
+}).enableRLS()
 
 export const verificationTokens = pgTable('verification_tokens', {
   identifier: text('identifier').notNull(),
   token: text('token').notNull(),
   expires: timestamp('expires').notNull(),
-})
+}).enableRLS()
 
 export const emailVerifications = pgTable('email_verifications', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -145,11 +148,11 @@ export const emailVerifications = pgTable('email_verifications', {
   used: boolean('used').default(false),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-})
+}).enableRLS()
 
 export const rateLimits = pgTable('rate_limits', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   ip: text('ip').notNull(),
   route: text('route').notNull(),
   ts: timestamp('ts').defaultNow().notNull(),
-})
+}).enableRLS()
