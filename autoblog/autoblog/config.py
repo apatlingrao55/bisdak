@@ -59,6 +59,8 @@ RESEND_API_KEY: str = os.environ.get("RESEND_API_KEY", "")
 FROM_EMAIL: str = os.environ.get("FROM_EMAIL", "hello@mail.bisdak.co.nz")
 NOTIFY_EMAIL: str = os.environ.get("NOTIFY_EMAIL", "hello@bisdak.co.nz")
 SITE_URL: str = os.environ.get("SITE_URL", "https://bisdak.co.nz")
+TELEGRAM_BOT_TOKEN: str = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID: str = os.environ.get("TELEGRAM_CHAT_ID", "")
 
 # Postgres connection for bisdak — point at the same DATABASE_URL the Next.js app uses.
 DATABASE_URL: str = os.environ.get("DATABASE_URL", "")

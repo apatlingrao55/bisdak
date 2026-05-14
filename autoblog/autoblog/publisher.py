@@ -59,7 +59,7 @@ def publish_draft(
                         )
                         VALUES (
                             gen_random_uuid()::text, %s, %s, %s, %s,
-                            'BisDak Team', 'draft', %s::jsonb,
+                            'BisDak Team', 'published', %s::jsonb,
                             NOW(), NOW()
                         )
                         RETURNING id
@@ -79,7 +79,7 @@ def publish_draft(
                         raise RuntimeError("INSERT RETURNING produced no row")
                     post_id = row["id"]
                     logger.info(
-                        "Inserted draft %s (slug=%s, title=%r)",
+                        "Published post %s (slug=%s, title=%r)",
                         post_id, candidate, title,
                     )
                     return post_id

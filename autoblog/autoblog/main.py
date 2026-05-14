@@ -273,21 +273,19 @@ def _publish_single_topic(topic_id: int) -> None:
                 (topic["primary_keyword"],),
             )
 
-    # 6. Notify
-    send_draft_ready(
-        post_id=post_id,
+    # 6. Published directly — notify via Telegram
+    from .notifier import send_published_telegram
+    send_published_telegram(
         title=post["title"],
-        excerpt=post["excerpt"],
         slug=post["slug"],
+        excerpt=post["excerpt"],
         word_count=post["word_count"],
-        review_passes=review_passes,
         quality_score=int(review.get("quality_score", 0)),
+        review_passes=review_passes,
         risk_flags=list(review.get("risk_flags") or []),
-        source_urls=list(post["metadata"].get("source_urls") or []),
-        body=post["body"],
     )
-    _log_run("publish", "ok", details=f"Published draft post_id={post_id}")
-    logger.info("Draft ready at %s/admin/posts/%s", config.SITE_URL, post_id)
+    _log_run("publish", "ok", details=f"Published post_id={post_id}")
+    logger.info("Published at %s/blog/%s", config.SITE_URL, post["slug"])
 
 
 def cmd_publish() -> None:

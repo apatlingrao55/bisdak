@@ -131,3 +131,47 @@ def send_dead_mans_switch(hours_since_last: float) -> None:
 """
     _send(subject, html)
     logger.info("Dead-man's-switch email sent (%.0fh since last draft)", hours_since_last)
+
+
+def send_published_telegram(
+    *,
+    title: str,
+    slug: str,
+    excerpt: str = "",
+    word_count: int,
+    quality_score: int,
+    review_passes: int = 0,
+    risk_flags: list[str] | None = None,
+) -> None:
+    """Send Telegram notification when a post goes live."""
+    import urllib.request, json as _json
+    bot_token = config.TELEGRAM_BOT_TOKEN
+    chat_id = config.TELEGRAM_CHAT_ID
+    if not bot_token or not chat_id:
+        logger.warning("TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not set — skipping Telegram for %s", slug)
+        return
+    post_url = f"{config.SITE_URL.rstrip('/')}/blog/{slug}"
+    flags_line = ("Flags: " + ", ".join(risk_flags)) if risk_flags else ""
+    parts = [
+        f"✅ BisDak published",
+        title,
+        "",
+        excerpt,
+        "",
+        f"{word_count} words · score {quality_score}/10 · {review_passes} revision(s)",
+    ]
+    if flags_line:
+        parts.append(flags_line)
+    parts.append(post_url)
+    text = "\n".join(p for p in parts)
+    payload = _json.dumps({"chat_id": chat_id, "text": text}).encode()
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{bot_token}/sendMessage",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        urllib.request.urlopen(req, timeout=10)
+        logger.info("Telegram notification sent for post %s", slug)
+    except Exception as exc:
+        logger.warning("Telegram notification failed: %s", exc)
