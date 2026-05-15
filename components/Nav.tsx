@@ -113,6 +113,9 @@ export default function Nav() {
         <Link href="/submit" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
           Submit a Business
         </Link>
+        <a href="mailto:hello@bisdak.co.nz" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '15px', letterSpacing: '0.3px' }}>
+          Contact
+        </a>
         {isLoggedIn ? (
           <>
             <Link href="/dashboard" className="btn-primary" style={{ padding: '7px 18px', fontSize: '14px' }}>
