@@ -1,15 +1,26 @@
 import Nav from '@/components/Nav'
 import MortgageCalculator from './MortgageCalculator'
+import { webApplicationJsonLd, jsonLdScript } from '@/lib/seo'
 
 export const metadata = {
   title: 'Mortgage Calculator',
   description:
     'Estimate your weekly, fortnightly, or monthly home loan repayments in New Zealand. Free mortgage calculator from BisDak.',
+  alternates: { canonical: '/tools/mortgage' },
 }
+
+const appLd = webApplicationJsonLd({
+  name: 'NZ Mortgage Repayment Calculator',
+  path: '/tools/mortgage',
+  description:
+    'Estimate your weekly, fortnightly, or monthly home loan repayments in New Zealand.',
+  category: 'FinanceApplication',
+})
 
 export default function MortgagePage() {
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(appLd)} />
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000' }}>
         <article style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(40px, 6vw, 64px) 24px 80px', color: '#D4D4D8', fontSize: 15, lineHeight: 1.8 }}>

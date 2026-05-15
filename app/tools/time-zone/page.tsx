@@ -1,15 +1,26 @@
 import Nav from '@/components/Nav'
 import TimeZoneConverter from './TimeZoneConverter'
+import { webApplicationJsonLd, jsonLdScript } from '@/lib/seo'
 
 export const metadata = {
   title: 'Manila ↔ NZ Time Zone Converter',
   description:
     'See what time it is in the Philippines and New Zealand right now. Convert between Manila and Auckland for calls home.',
+  alternates: { canonical: '/tools/time-zone' },
 }
+
+const appLd = webApplicationJsonLd({
+  name: 'Manila ↔ NZ Time Zone Converter',
+  path: '/tools/time-zone',
+  description:
+    'See what time it is in the Philippines and New Zealand, and convert any moment between Manila and NZ.',
+  category: 'UtilityApplication',
+})
 
 export default function TimeZonePage() {
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(appLd)} />
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000' }}>
         <article style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(40px, 6vw, 64px) 24px 80px', color: '#D4D4D8', fontSize: 15, lineHeight: 1.8 }}>

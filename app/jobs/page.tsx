@@ -10,8 +10,9 @@ import { listActiveJobs } from '@/lib/jobs/queries'
 type SearchParams = Promise<{ region?: string; type?: string; q?: string }>
 
 export const metadata = {
-  title: 'Jobs — BisDak',
+  title: { absolute: 'Jobs — BisDak NZ' },
   description: 'Browse jobs at Filipino-owned businesses across New Zealand.',
+  alternates: { canonical: '/jobs' },
 }
 
 export default async function JobsPage({ searchParams }: { searchParams: SearchParams }) {

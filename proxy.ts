@@ -39,10 +39,10 @@ export default auth(async (req) => {
     const ua = req.headers.get('user-agent') ?? ''
     const isGoodBot = GOOD_BOT_RE.test(ua)
 
-    // Good bots skip the UA blocklist + Accept-* checks (some legit crawlers
-    // omit Accept-Language). They DO still hit the rate limit — UA spoofing
-    // would otherwise bypass the limit entirely.
-    if (!isGoodBot) {
+    // UA blocklist + header checks only run on mutating requests. Read-only
+    // GETs (/search, /jobs) stay accessible to crawlers, link checkers, and
+    // curl-based verification — the rate limit below still caps scraping.
+    if (method === 'POST' && !isGoodBot) {
       if (BAD_TOOL_RE.test(ua)) return block('blacklisted-ua', 403)
       if (!req.headers.get('accept')) return block('missing-accept', 403)
       if (!req.headers.get('accept-language')) return block('missing-accept-language', 403)

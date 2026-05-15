@@ -1,0 +1,51 @@
+# BisDak — Filipino Business Directory New Zealand
+# https://bisdak.co.nz
+
+> BisDak is New Zealand's directory of Filipino-owned businesses, serving the
+> Kiwi-Filipino community across Auckland, Wellington, Canterbury, Waikato and
+> beyond. The name "BisDak" is Cebuano slang for "Bisaya" — the Visayan-speaking
+> peoples of the central and southern Philippines — and reflects the site's
+> community roots.
+
+## About
+
+BisDak is a Kiwi-Filipino directory platform listing Filipino-owned businesses
+across New Zealand. It covers eight categories: Food & Dining, Professional
+Services, Health & Wellness, Trades & Home Services, Beauty & Personal Care,
+Remittance & Travel, Retail & Groceries, and Community & Events. The platform
+also publishes guides relevant to Filipinos living in or migrating to New
+Zealand, and runs a small jobs board for roles at Filipino-owned businesses.
+
+## Business directory
+
+- Browse and search all listings: https://bisdak.co.nz/search
+- Submit a business (free): https://bisdak.co.nz/submit
+
+## Community blog
+
+Guides and news for Filipinos in Aotearoa New Zealand. Topics include NZ
+immigration, balikbayan shipping, employment, and community events.
+
+- Blog index: https://bisdak.co.nz/blog
+- INZ application system upgrade guide: https://bisdak.co.nz/blog/inz-application-system-upgrade-what-filipino-applicants-must-know
+- Accredited Employer Work Visa guide: https://bisdak.co.nz/blog/accredited-employer-work-visa-nz-requirements-explained
+- Caregiver jobs in NZ for Filipinos: https://bisdak.co.nz/blog/caregiver-jobs-in-new-zealand-for-filipinos-full-guide
+- Balikbayan box from NZ guide: https://bisdak.co.nz/blog/how-to-send-a-balikbayan-box-from-nz-complete-guide
+
+## Free tools
+
+- NZ Mortgage Calculator: https://bisdak.co.nz/tools/mortgage
+- NZ PAYE Calculator:     https://bisdak.co.nz/tools/paye
+- NZ GST Calculator:      https://bisdak.co.nz/tools/gst
+- NZD/PHP Currency:       https://bisdak.co.nz/tools/currency
+- NZ↔PH Time Zone:        https://bisdak.co.nz/tools/time-zone
+- Pomodoro Timer:         https://bisdak.co.nz/tools/timer
+
+## Jobs
+
+- Jobs board: https://bisdak.co.nz/jobs
+
+## Contact
+
+- Email: hello@bisdak.co.nz
+- Submit a listing: https://bisdak.co.nz/submit

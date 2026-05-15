@@ -2,19 +2,21 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import Nav from '@/components/Nav'
+import BusinessCard from '@/components/BusinessCard'
 import StarRating from '@/components/StarRating'
 import ShareButton from '@/components/ShareButton'
 import ClaimButton from '@/components/ClaimButton'
 import RevealContact from '@/components/RevealContact'
 import { db } from '@/lib/db'
-import { reviews, businessClaims } from '@/lib/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { reviews, businessClaims, businesses } from '@/lib/db/schema'
+import { eq, and, ne } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
-import { getBusinessBySlug } from '@/lib/db/queries'
+import { getBusinessBySlug, getBusinessCards } from '@/lib/db/queries'
 import { listActiveJobsForBusiness } from '@/lib/jobs/queries'
 import { auth } from '@/auth'
 import { getCategoryColor } from '@/lib/category-color'
 import { extractMapsQuery } from '@/lib/maps'
+import { businessJsonLd, breadcrumbJsonLd, jsonLdScript } from '@/lib/seo'
 
 const BASE = 'https://bisdak.co.nz'
 
@@ -29,9 +31,9 @@ export async function generateMetadata({ params }: { params: Params }) {
     ? `${biz.description} · Filipino-owned business in ${biz.regionName ?? 'NZ'} listed on BisDak.`
     : `${biz.name} is a Filipino-owned business in ${biz.regionName ?? 'New Zealand'}. Find contact details and reviews on BisDak.`
   return {
-    title,
+    title: { absolute: `${title} — BisDak NZ` },
     description,
-    alternates: { canonical: `${BASE}/business/${slug}` },
+    alternates: { canonical: `/business/${slug}` },
     openGraph: {
       title,
       description,
@@ -83,31 +85,43 @@ export default async function BusinessPage({ params }: { params: Params }) {
     ? bizReviews.reduce((sum, r) => sum + r.rating, 0) / bizReviews.length
     : 0
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: biz.name,
-    description: biz.description ?? undefined,
-    url: biz.website ?? `${BASE}/business/${biz.slug}`,
-    ...(biz.regionName ? { address: { '@type': 'PostalAddress', addressRegion: biz.regionName, addressCountry: 'NZ' } } : {}),
-    ...(avgRating > 0 ? {
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: avgRating.toFixed(1),
-        reviewCount: bizReviews.length,
-        bestRating: 5,
-        worstRating: 1,
-      },
-    } : {}),
-    ...(biz.photoUrl ? { image: biz.photoUrl } : {}),
+  const bizJsonLd = businessJsonLd(biz, {
+    avgRating: avgRating > 0 ? avgRating : undefined,
+    reviewCount: bizReviews.length,
+  })
+
+  const trail = [{ name: 'Home', url: '/' }]
+  if (biz.categoryName && biz.categorySlug) {
+    trail.push({ name: biz.categoryName, url: `/search?category=${biz.categorySlug}` })
   }
+  trail.push({ name: biz.name, url: `/business/${biz.slug}` })
+  const breadcrumbLd = breadcrumbJsonLd(trail)
+
+  // Related listings: prefer same category, fall back to same region
+  type Card = Awaited<ReturnType<typeof getBusinessCards>>[number]
+  let related: Card[] = []
+  const categoryId = await db
+    .select({ id: businesses.categoryId })
+    .from(businesses)
+    .where(eq(businesses.id, biz.id))
+    .limit(1)
+    .then(rows => rows[0]?.id ?? null)
+  if (categoryId) {
+    related = await getBusinessCards({
+      limit: 7,
+      conditions: [eq(businesses.categoryId, categoryId), ne(businesses.id, biz.id)],
+      orderBy: 'featured',
+    })
+  }
+  related = related.filter(r => r.slug !== biz.slug).slice(0, 6)
 
   const mapsQuery = biz.googleMapsUrl ? extractMapsQuery(biz.googleMapsUrl) : null
   const mapsEmbedQuery = mapsQuery ?? (biz.name + (biz.regionName ? `, ${biz.regionName}, New Zealand` : ', New Zealand'))
 
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(bizJsonLd)} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(breadcrumbLd)} />
       <Nav />
 
       {/* ── Section 1: Hero Banner ── */}
@@ -195,6 +209,21 @@ export default async function BusinessPage({ params }: { params: Params }) {
         </div>
       </section>
 
+      {/* ── Breadcrumb (visible) ── */}
+      <nav aria-label="Breadcrumb" style={{ background: '#02090A', padding: '16px clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
+        <ol style={{ display: 'flex', flexWrap: 'wrap', gap: 8, listStyle: 'none', padding: 0, margin: 0, color: '#71717A', fontSize: 13 }}>
+          <li><Link href="/" style={{ color: '#A1A1AA', textDecoration: 'none' }}>Home</Link></li>
+          {biz.categoryName && biz.categorySlug && (
+            <>
+              <li aria-hidden="true">›</li>
+              <li><Link href={`/search?category=${biz.categorySlug}`} style={{ color: '#A1A1AA', textDecoration: 'none' }}>{biz.categoryName}</Link></li>
+            </>
+          )}
+          <li aria-hidden="true">›</li>
+          <li style={{ color: '#52525B' }} aria-current="page">{biz.name}</li>
+        </ol>
+      </nav>
+
       {/* ── Section 2: About ── */}
       {biz.description && (
         <section style={{ background: '#02090A', padding: 'clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
@@ -205,6 +234,67 @@ export default async function BusinessPage({ params }: { params: Params }) {
           </div>
         </section>
       )}
+
+      {/* ── Section 2b: Listing details ── */}
+      <section style={{ background: '#02090A', padding: 'clamp(32px, 5vw, 56px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
+        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+          <h2 style={{ color: '#fff', fontSize: 22, fontWeight: 400, margin: '0 0 20px' }}>About this listing</h2>
+          <p style={{ color: '#A1A1AA', fontSize: 16, lineHeight: 1.7, margin: '0 0 24px' }}>
+            {biz.name} is a Filipino-owned {biz.categoryName ? biz.categoryName.toLowerCase() : 'business'}
+            {biz.regionName ? ` operating in ${biz.regionName}, New Zealand` : ' in New Zealand'}.
+            It&apos;s listed on BisDak — Aotearoa&apos;s directory of Filipino-owned businesses — to help the
+            Kiwi-Filipino community discover and support kababayan-run businesses across the country.
+            Use the links above to visit their website, follow them on Facebook, or get directions. If
+            you&apos;ve been a customer, please share your experience by writing a review below.
+          </p>
+          <dl style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, color: '#A1A1AA', fontSize: 14, margin: 0 }}>
+            {biz.categoryName && (
+              <div>
+                <dt style={{ color: '#52525B', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', margin: '0 0 4px' }}>Category</dt>
+                <dd style={{ margin: 0 }}>
+                  {biz.categorySlug ? (
+                    <Link href={`/search?category=${biz.categorySlug}`} style={{ color: '#36F4A4', textDecoration: 'none' }}>{biz.categoryName}</Link>
+                  ) : (
+                    biz.categoryName
+                  )}
+                </dd>
+              </div>
+            )}
+            {biz.regionName && (
+              <div>
+                <dt style={{ color: '#52525B', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', margin: '0 0 4px' }}>Region</dt>
+                <dd style={{ margin: 0 }}>{biz.regionName}, New Zealand</dd>
+              </div>
+            )}
+            <div>
+              <dt style={{ color: '#52525B', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', margin: '0 0 4px' }}>Country</dt>
+              <dd style={{ margin: 0 }}>New Zealand</dd>
+            </div>
+            {biz.isFilipino && (
+              <div>
+                <dt style={{ color: '#52525B', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', margin: '0 0 4px' }}>Ownership</dt>
+                <dd style={{ margin: 0 }}>🇵🇭 Filipino-owned</dd>
+              </div>
+            )}
+            {biz.openStatus && (
+              <div>
+                <dt style={{ color: '#52525B', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', margin: '0 0 4px' }}>Currently</dt>
+                <dd style={{ margin: 0 }}>{biz.openStatus === 'open' ? '🟢 Open now' : '⚫ Closed'}</dd>
+              </div>
+            )}
+            {biz.website && (
+              <div>
+                <dt style={{ color: '#52525B', fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase', margin: '0 0 4px' }}>Website</dt>
+                <dd style={{ margin: 0 }}>
+                  <a href={biz.website} target="_blank" rel="noopener noreferrer" style={{ color: '#36F4A4', textDecoration: 'none' }}>
+                    {(() => { try { return new URL(biz.website).hostname.replace(/^www\./, '') } catch { return biz.website } })()}
+                  </a>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </section>
 
       {/* ── Section 3: Contact Strip ── */}
       <section style={{ background: '#061A1C', padding: 'clamp(28px, 4vw, 48px) clamp(24px, 5vw, 64px)', borderBottom: '1px solid #1E2C31' }}>
@@ -414,6 +504,32 @@ export default async function BusinessPage({ params }: { params: Params }) {
           )}
         </div>
       </section>
+
+      {/* ── Section 7: Related Listings ── */}
+      {related.length > 0 && (
+        <section style={{ background: '#02090A', padding: 'clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px)', borderTop: '1px solid #1E2C31' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <h2 style={{ color: '#fff', fontSize: 'clamp(22px, 3vw, 28px)', fontWeight: 400, margin: '0 0 8px' }}>
+              More Filipino-owned {biz.categoryName ?? 'businesses'}{biz.regionName ? ` in ${biz.regionName}` : ''}
+            </h2>
+            <p style={{ color: '#A1A1AA', fontSize: 15, margin: '0 0 28px' }}>
+              Discover other kababayan-run businesses on BisDak.
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))',
+              gap: '20px',
+            }}>
+              {related.map(r => (
+                <BusinessCard key={r.id} business={r} />
+              ))}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 32 }}>
+              <Link href="/search" className="btn-ghost">View all listings →</Link>
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   )
 }

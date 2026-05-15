@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import BusinessCard from '@/components/BusinessCard'
 import SearchBar from '@/components/SearchBar'
@@ -8,6 +9,13 @@ import { businesses, categories, regions } from '@/lib/db/schema'
 import { eq, ilike, or } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 import { getBusinessCards } from '@/lib/db/queries'
+
+export const metadata: Metadata = {
+  title: 'Search Filipino businesses in NZ',
+  description:
+    'Search the BisDak directory of Filipino-owned businesses across Auckland, Wellington, Canterbury, Waikato, and the rest of New Zealand.',
+  alternates: { canonical: '/search' },
+}
 
 type SearchParams = Promise<{
   q?: string

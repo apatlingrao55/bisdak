@@ -20,7 +20,6 @@ export const metadata: Metadata = {
     template: '%s — BisDak NZ',
   },
   description: "New Zealand's definitive directory of Filipino-owned businesses. Find your kababayan's business at bisdak.co.nz.",
-  keywords: ['Filipino businesses New Zealand', 'Pinoy business NZ', 'Filipino directory NZ', 'BisDak', 'Filipino-owned NZ'],
   authors: [{ name: 'BisDak Team', url: BASE }],
   creator: 'BisDak',
   openGraph: {
@@ -36,9 +35,33 @@ export const metadata: Metadata = {
     title: 'BisDak — Pinoy Business Hub NZ',
     description: "New Zealand's definitive directory of Filipino-owned businesses.",
   },
-  alternates: { canonical: BASE },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 }
+
+const siteJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${BASE}/#organization`,
+    name: 'BisDak',
+    url: BASE,
+    logo: { '@type': 'ImageObject', url: `${BASE}/icons/icon-512x512.png` },
+    description: "New Zealand's directory of Filipino-owned businesses.",
+    areaServed: 'NZ',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${BASE}/#website`,
+    url: BASE,
+    name: 'BisDak — Pinoy Business Hub NZ',
+    publisher: { '@id': `${BASE}/#organization` },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: { '@type': 'EntryPoint', urlTemplate: `${BASE}/search?q={search_term_string}` },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+]
 
 export default function RootLayout({
   children,
@@ -51,6 +74,10 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#02090A" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+        />
       </head>
       <body className="min-h-screen antialiased">
         <Suspense fallback={null}>

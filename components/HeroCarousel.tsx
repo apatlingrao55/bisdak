@@ -9,13 +9,16 @@ export default function HeroCarousel() {
   return (
     <section style={{ position: 'relative', minHeight: '100vh', background: '#000', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
 
-      {/* Video background */}
+      {/* Video background — preload metadata only so the static poster paints
+          as LCP rather than waiting for video bytes. */}
       <video
         ref={(el) => { if (el) el.playbackRate = 0.5 }}
         autoPlay
         muted
         loop
         playsInline
+        preload="metadata"
+        poster="/opengraph-image"
         style={{
           position: 'absolute',
           inset: 0,

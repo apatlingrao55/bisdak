@@ -7,6 +7,8 @@ import { eq } from 'drizzle-orm'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { renderContent } from '@/lib/blog-renderer'
+import { SITE_BASE, breadcrumbJsonLd, jsonLdScript } from '@/lib/seo'
+import { slugifyAuthor, authorIsTeam } from '@/lib/authors'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -14,7 +16,22 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const [post] = await db.select().from(posts).where(eq(posts.slug, slug)).limit(1)
   if (!post) return {}
-  return { title: `${post.title} — BisDak`, description: post.excerpt }
+  const hasBrand = /bisdak/i.test(post.title)
+  return {
+    // If the post title already contains "BisDak" (e.g. the welcome post),
+    // skip the template suffix so the brand only appears once.
+    title: hasBrand ? { absolute: post.title } : post.title,
+    description: post.excerpt,
+    alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: `${SITE_BASE}/blog/${slug}`,
+      type: 'article',
+      publishedTime: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
+      images: [{ url: `${SITE_BASE}/opengraph-image`, width: 1200, height: 630, alt: post.title }],
+    },
+  }
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -27,20 +44,43 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post || post.status !== 'published') notFound()
 
+  const url = `${SITE_BASE}/blog/${post.slug}`
+  const isTeam = authorIsTeam(post.authorName)
+  const authorSlug = slugifyAuthor(post.authorName)
+  const datePublished = post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined
+  const dateModified = post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt,
-    author: { '@type': 'Organization', name: post.authorName },
-    publisher: { '@type': 'Organization', name: 'BisDak', url: 'https://bisdak.co.nz' },
-    datePublished: post.publishedAt ? new Date(post.publishedAt).toISOString() : undefined,
-    url: `https://bisdak.co.nz/blog/${post.slug}`,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    image: {
+      '@type': 'ImageObject',
+      url: `${SITE_BASE}/opengraph-image`,
+      width: 1200,
+      height: 630,
+    },
+    author: isTeam
+      ? { '@type': 'Organization', '@id': `${SITE_BASE}/#organization`, name: post.authorName }
+      : { '@type': 'Person', name: post.authorName, url: `${SITE_BASE}/authors/${authorSlug}` },
+    publisher: { '@id': `${SITE_BASE}/#organization` },
+    datePublished,
+    dateModified,
+    url,
   }
+
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: '/' },
+    { name: 'News & Stories', url: '/blog' },
+    { name: post.title, url: `/blog/${post.slug}` },
+  ])
 
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(jsonLd)} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(breadcrumbLd)} />
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000000' }}>
 
@@ -51,7 +91,13 @@ export default async function BlogPostPage({ params }: Props) {
               ← Back to News
             </Link>
             <p style={{ color: '#71717A', fontSize: '13px', letterSpacing: '0.5px', margin: '0 0 20px' }}>
-              {post.authorName} · {post.publishedAt
+              {isTeam ? (
+                post.authorName
+              ) : (
+                <Link href={`/authors/${authorSlug}`} style={{ color: '#A1A1AA', textDecoration: 'none' }}>{post.authorName}</Link>
+              )}
+              {' · '}
+              {post.publishedAt
                 ? new Date(post.publishedAt).toLocaleDateString('en-NZ', { year: 'numeric', month: 'long', day: 'numeric' })
                 : ''}
             </p>

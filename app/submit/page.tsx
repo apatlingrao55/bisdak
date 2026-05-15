@@ -1,8 +1,16 @@
 export const revalidate = 300
 
+import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import { db } from '@/lib/db'
 import { categories, regions } from '@/lib/db/schema'
+
+export const metadata: Metadata = {
+  title: 'Submit a Business',
+  description:
+    "List your Filipino-owned business on BisDak for free. NZ-wide directory of Filipino businesses across Auckland, Wellington, Canterbury, Waikato, and beyond.",
+  alternates: { canonical: '/submit' },
+}
 
 type SearchParams = Promise<{ success?: string }>
 

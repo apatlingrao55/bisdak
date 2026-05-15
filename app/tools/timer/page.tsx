@@ -1,15 +1,25 @@
 import Nav from '@/components/Nav'
 import TimerTool from './TimerTool'
+import { webApplicationJsonLd, jsonLdScript } from '@/lib/seo'
 
 export const metadata = {
   title: 'Timer & Countdown',
   description:
     'Free stopwatch and countdown timer for cooking, Pomodoro work sessions, exercise, prayer, and more.',
+  alternates: { canonical: '/tools/timer' },
 }
+
+const appLd = webApplicationJsonLd({
+  name: 'Stopwatch & Countdown Timer',
+  path: '/tools/timer',
+  description: 'Free in-browser stopwatch and countdown timer.',
+  category: 'UtilityApplication',
+})
 
 export default function TimerPage() {
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(appLd)} />
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000' }}>
         <article style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(40px, 6vw, 64px) 24px 80px', color: '#D4D4D8', fontSize: 15, lineHeight: 1.8 }}>

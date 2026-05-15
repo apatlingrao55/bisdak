@@ -7,8 +7,9 @@ import { eq, desc } from 'drizzle-orm'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'News & Stories — BisDak Pinoy Business Hub NZ',
+  title: 'News & Stories',
   description: 'Community news, business spotlights, and stories from the Filipino community in New Zealand.',
+  alternates: { canonical: '/blog' },
 }
 
 export default async function BlogPage() {

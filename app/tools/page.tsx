@@ -1,10 +1,12 @@
 import Nav from '@/components/Nav'
 import Link from 'next/link'
+import { SITE_BASE, jsonLdScript } from '@/lib/seo'
 
 export const metadata = {
   title: 'Tools',
   description:
     'Free calculators and quick references for the Filipino community in New Zealand: mortgage, PAYE / take-home pay, GST, NZD ↔ PHP currency, Manila ↔ NZ time zone.',
+  alternates: { canonical: '/tools' },
 }
 
 const TOOLS = [
@@ -47,8 +49,20 @@ const TOOLS = [
 ] as const
 
 export default function ToolsPage() {
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Free tools for Pinoy Kiwis',
+    itemListElement: TOOLS.map((t, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: t.title,
+      url: `${SITE_BASE}/tools/${t.slug}`,
+    })),
+  }
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(itemList)} />
       <Nav />
       <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#000' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(40px, 6vw, 64px) 24px 80px' }}>

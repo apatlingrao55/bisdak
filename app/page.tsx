@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
 import Nav from '@/components/Nav'
 import HeroCarousel from '@/components/HeroCarousel'
 import CategoryGrid from '@/components/CategoryGrid'
@@ -9,6 +10,10 @@ import { categories, posts } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { getBusinessCards } from '@/lib/db/queries'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 export default async function HomePage() {
   const allCategories = await db.select().from(categories)
