@@ -196,6 +196,13 @@ export default function Nav() {
               </Link>
             </>
           )}
+          <a
+            href="mailto:hello@bisdak.co.nz"
+            onClick={() => setMenuOpen(false)}
+            style={{ color: '#A1A1AA', textDecoration: 'none', fontSize: '15px', fontWeight: 400, marginTop: '12px', borderTop: '1px solid #1E2C31', paddingTop: '24px' }}
+          >
+            hello@bisdak.co.nz
+          </a>
         </div>
       )}
     </nav>
