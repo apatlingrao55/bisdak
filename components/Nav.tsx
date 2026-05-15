@@ -202,7 +202,8 @@ export default function Nav() {
           <a
             href="mailto:hello@bisdak.co.nz"
             onClick={() => setMenuOpen(false)}
-            style={{ color: '#A1A1AA', textDecoration: 'none', fontSize: '15px', fontWeight: 400, marginTop: '12px', borderTop: '1px solid #1E2C31', paddingTop: '24px' }}
+            className="btn-ghost"
+            style={{ alignSelf: 'flex-start', marginTop: '12px', fontSize: '15px', padding: '12px 22px' }}
           >
             hello@bisdak.co.nz
           </a>
