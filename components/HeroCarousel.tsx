@@ -60,7 +60,7 @@ export default function HeroCarousel() {
           whiteSpace: 'pre-line',
           textShadow: '0 2px 20px rgba(0,0,0,0.5)',
         }}>
-          {'Find Filipino\nbusinesses in NZ.'}
+          {'Find Filipino-Kiwi\nbusinesses in NZ.'}
         </h1>
         <p style={{
           color: 'rgba(255,255,255,0.8)',
@@ -70,7 +70,7 @@ export default function HeroCarousel() {
           lineHeight: 1.55,
           textShadow: '0 1px 8px rgba(0,0,0,0.4)',
         }}>
-          The definitive directory of Filipino-owned businesses across New Zealand. From adobo to accounting — find your kababayan.
+          The definitive directory of Filipino-Kiwi owned businesses across New Zealand. From adobo to accounting — find your kababayan.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
           <Link href="/search" className="btn-primary" style={{ fontSize: 16, padding: '13px 28px' }}>
@@ -89,8 +89,8 @@ export default function HeroCarousel() {
           lineHeight: 1.55,
           textShadow: '0 1px 8px rgba(0,0,0,0.4)',
         }}>
-          <span style={{ color: '#ffffff', fontWeight: 500 }}>Is your business missing?</span>{' '}
-          Submit a listing for free — it takes 2 minutes.
+          <span style={{ color: '#ffffff', fontWeight: 500 }}>Libreng webpage.</span>{' '}
+          Sign up to claim your business.
         </p>
       </div>
     </section>

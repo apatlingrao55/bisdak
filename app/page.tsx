@@ -39,7 +39,7 @@ export default async function HomePage() {
             Browse by Category
           </h2>
           <p style={{ color: '#A1A1AA', textAlign: 'center', margin: '0 0 48px', fontSize: '18px' }}>
-            8 categories covering every Filipino business in New Zealand
+            8 categories covering every Filipino-Kiwi business in New Zealand
           </p>
           <CategoryGrid categories={allCategories} />
         </div>
@@ -130,13 +130,13 @@ export default async function HomePage() {
         borderTop: '1px solid #1E2C31',
       }}>
         <h3 style={{ color: '#ffffff', fontSize: '28px', fontWeight: 330, margin: '0 0 12px' }}>
-          Is your business missing?
+          Libreng webpage para sa negosyo mo.
         </h3>
         <p style={{ color: '#A1A1AA', margin: '0 0 28px', fontSize: '17px' }}>
-          Submit a listing for free — it takes 2 minutes.
+          Sign up to claim your business — it takes 2 minutes.
         </p>
         <a href="/submit" className="btn-primary" style={{ fontSize: '17px', padding: '14px 32px' }}>
-          Submit a Business — It&apos;s Free
+          Claim Your Business — It&apos;s Free
         </a>
       </section>
 

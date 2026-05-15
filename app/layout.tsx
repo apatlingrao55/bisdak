@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     default: 'BisDak — Pinoy Business Hub NZ',
     template: '%s — BisDak NZ',
   },
-  description: "New Zealand's definitive directory of Filipino-owned businesses. Find your kababayan's business at bisdak.co.nz.",
+  description: "New Zealand's definitive directory of Filipino-Kiwi-owned businesses. Find your kababayan's business at bisdak.co.nz.",
   authors: [{ name: 'BisDak Team', url: BASE }],
   creator: 'BisDak',
   openGraph: {
@@ -28,12 +28,12 @@ export const metadata: Metadata = {
     url: BASE,
     siteName: 'BisDak — Pinoy Business Hub NZ',
     title: 'BisDak — Pinoy Business Hub NZ',
-    description: "New Zealand's definitive directory of Filipino-owned businesses.",
+    description: "New Zealand's definitive directory of Filipino-Kiwi-owned businesses.",
   },
   twitter: {
     card: 'summary_large_image',
     title: 'BisDak — Pinoy Business Hub NZ',
-    description: "New Zealand's definitive directory of Filipino-owned businesses.",
+    description: "New Zealand's definitive directory of Filipino-Kiwi-owned businesses.",
   },
 }
 
@@ -45,7 +45,7 @@ const siteJsonLd = [
     name: 'BisDak',
     url: BASE,
     logo: { '@type': 'ImageObject', url: `${BASE}/icons/icon-512x512.png` },
-    description: "New Zealand's directory of Filipino-owned businesses.",
+    description: "New Zealand's directory of Filipino-Kiwi-owned businesses.",
     areaServed: 'NZ',
   },
   {
