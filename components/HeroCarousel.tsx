@@ -76,6 +76,9 @@ export default function HeroCarousel() {
           <Link href="/search" className="btn-primary" style={{ fontSize: 16, padding: '13px 28px' }}>
             Browse All Businesses →
           </Link>
+          <Link href="/auth/sign-up" className="btn-ghost" style={{ fontSize: 16, padding: '13px 28px' }}>
+            Sign Up
+          </Link>
           <Link href="/submit" className="btn-ghost" style={{ fontSize: 16, padding: '13px 28px' }}>
             Submit a Business
           </Link>
