@@ -46,6 +46,12 @@ const TOOLS = [
     title: 'Timer & countdown',
     desc: 'Stopwatch and countdown timer for cooking, Pomodoro, exercise, or prayer.',
   },
+  {
+    slug: 'passport-photo',
+    icon: '📷',
+    title: 'Passport photo crop',
+    desc: 'Crop your photo to the correct size for NZ and AU passport applications. Free and private.',
+  },
 ] as const
 
 export default function ToolsPage() {

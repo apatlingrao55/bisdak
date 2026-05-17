@@ -223,6 +223,23 @@ test('submit business form works', async ({ page }) => {
   await expect(page.locator('text=submission has been received')).toBeVisible()
 })
 
+// ── Tools ──
+
+test('/tools index lists passport photo tool', async ({ page }) => {
+  const errors = collectConsoleErrors(page)
+  await page.goto('/tools')
+  await expect(page.locator('a[href="/tools/passport-photo"]')).toBeVisible()
+  expect(errors).toHaveLength(0)
+})
+
+test('/tools/passport-photo loads with upload area', async ({ page }) => {
+  const errors = collectConsoleErrors(page)
+  await page.goto('/tools/passport-photo')
+  await expect(page.locator('h1')).toContainText(/passport photo/i)
+  await expect(page.getByRole('button', { name: /upload/i })).toBeVisible()
+  expect(errors).toHaveLength(0)
+})
+
 // ── Sitemap ──
 
 test('sitemap.xml returns valid XML', async ({ request }) => {
