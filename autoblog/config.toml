@@ -15,4 +15,4 @@ review_model = "opus"
 max_llm_calls_per_day = 60
 
 [schedule]
-posts_per_week = 5
+posts_per_week = 20
