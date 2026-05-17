@@ -80,8 +80,8 @@ hour value by +12 (NZST) or +13 (NZDT).
 # discover daily at 02:00 NZT (1h before InspectPro autoblog's 03:00 discover)
 0 2 * * *    /opt/bisdak-autoblog/run.sh discover
 
-# publish Mon-Fri at 09:00 NZT (between InspectPro's 06:00 and 14:00 publish)
-0 9 * * 1-5  /opt/bisdak-autoblog/run.sh publish
+# publish 2x/day Mon-Fri at 03:00 and 13:00 NZT
+0 3,13 * * 1-5 /opt/bisdak-autoblog/run.sh publish
 
 # weekly keyword refresh at 02:00 NZT Sunday
 0 2 * * 0    /opt/bisdak-autoblog/run.sh keywords
